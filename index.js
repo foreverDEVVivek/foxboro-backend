@@ -17,6 +17,10 @@ app.use(express.static(config.path.join(__dirname, 'public')));
 
 app.use('/api/v1/auth', config.Router);
 
+app.get('/',(req,res)=>{
+    res.json("Api working");
+});
+
 // Error handling middleware
 app.use(config.errorMiddleware);
 
