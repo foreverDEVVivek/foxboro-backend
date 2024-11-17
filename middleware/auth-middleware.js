@@ -58,7 +58,6 @@ const validateUserOtp=async(req,res,next)=>{
   //Checking user is generating otp code only once at a time
   const existingUserOtp = await Otp.findOne({email:req.body.email});
   if(existingUserOtp){
-    console.log('check');
     return res.status(404).json({message:"You have already requested for Otp please wait ...."});
   }
   else{

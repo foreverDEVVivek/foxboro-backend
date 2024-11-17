@@ -1,6 +1,7 @@
 const jwt =require('jsonwebtoken');
 const sendOtp=require('../utils/send-mailer.js');
 const User=require('../models/users');
+const Otp = require('../models/otp');
 
 const authLoginController = async (req, res) => {
   try {
@@ -18,9 +19,15 @@ const authLoginOtpController = async(req, res) =>{
 }
 
 const authSigninController=async(req, res) => {
+  const existingUserOtp = await Otp.findOne({email:req.body.email});
+  if(existingUserOtp){
+    return res.status(404).json({message:"You have already requested for Otp please wait ...."});
+  }
+  else{
   sendOtp(req.body.email);
   req.session.user=req.body;
   res.json({ message: "Sign In Successful! OTP Sent" });
+}
 }
 
 const authSigninOtpController=async(req,res)=>{
