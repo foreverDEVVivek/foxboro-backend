@@ -8,14 +8,22 @@ const sessionConfig ={
     secret:process.env.SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 600000 }  // 10 minutes
+    cookie: { maxAge: 600000,
+        secure: false,
+     }  // 10 minutes
 }
 app.use(session(sessionConfig));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(express.static(config.path.join(__dirname, 'public')));
+//Authentication Router
+app.use('/api/v1/auth', config.authRouter);
 
-app.use('/api/v1/auth', config.Router);
+//Product Router
+app.use('/api/v1/products',config.productRouter);
+
+//Admin Router
+app.use('/api/v1/admin', config.adminRouter);
 
 app.get('/',(req,res)=>{
     res.json("Api working");

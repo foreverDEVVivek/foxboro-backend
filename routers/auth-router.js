@@ -1,21 +1,21 @@
 const express=require('express');
-const Router= express.Router();
+const authRouter= express.Router();
 const authController= require('../controllers/auth-controller');
-const {validateLoginUser,vaildateSigninUser,validateOTP,validateUserOtp}=require('../middleware/auth-middleware');
+const {validateLoginUser,vaildateSigninUser,validateOTP,validateAdmin,validateUserOtp}=require('../middleware/auth-middleware');
 
 //Sign In authentication user
-Router.route('/signin')
+authRouter.route('/signin')
 .post(vaildateSigninUser,authController.authSigninController);
 
 // Sign In OTP authentication user
-Router.route('/signin/otp')
+authRouter.route('/signin/otp')
 .post(validateOTP,authController.authSigninOtpController);
 
 // Login authentication user
-Router.route('/login')
-.post(validateLoginUser,validateUserOtp,authController.authLoginController)
+authRouter.route('/login')
+.post(validateLoginUser,validateUserOtp,validateAdmin,authController.authLoginController)
 
-Router.route('/login/otp')
+authRouter.route('/login/otp')
 .post(validateOTP,authController.authLoginOtpController)
 
-module.exports = Router;
+module.exports = authRouter;

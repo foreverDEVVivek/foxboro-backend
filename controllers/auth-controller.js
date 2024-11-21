@@ -6,6 +6,7 @@ const Otp = require('../models/otp');
 const authLoginController = async (req, res) => {
   try {
     sendOtp(req.body.email)
+    req.session.loggedInUserEmail=req.body.email;
     res.status(200).json({ message: "OTP Sent Successfully!"});
   } catch (error) {
     res.status(404).json({ message: "Something went wrong Try again after 10 minutes!"});
@@ -13,15 +14,20 @@ const authLoginController = async (req, res) => {
 };
 
 const authLoginOtpController = async(req, res) =>{
-  const options = { expiresIn: 50*6 , issuer:'foxboro-api',audience:'consumer' };
-  const token=jwt.sign(req.body,process.env.JWT_SECRET_KEY,options);
-  res.json({ message: "Thank you for Log In",token:token});
+  try {
+    const options = { expiresIn: 50*6 , issuer:'foxboro-api',audience:'consumer' };
+    const token=jwt.sign(req.body,process.env.JWT_SECRET_KEY,options);
+    res.header('Authorization',`Bearer ${token}`);
+    res.json({ message: "Thank you for Log In"});
+  } catch (error) {
+    new Error("Error while logging in",404);
+  }
 }
 
 const authSigninController=async(req, res) => {
   const existingUserOtp = await Otp.findOne({email:req.body.email});
   if(existingUserOtp){
-    return res.status(404).json({message:"You have already requested for Otp please wait ...."});
+    return res.status(404).json({message:"You have already requested for Otp please wait 10 min...."});
   }
   else{
   sendOtp(req.body.email);
@@ -35,6 +41,7 @@ const authSigninOtpController=async(req,res)=>{
   await newUser.save();
   const options = { expiresIn: 50*6 , issuer:'foxboro-api',audience:'consumer' };
   const token=jwt.sign(req.body,process.env.JWT_SECRET_KEY,options);
-  res.json({ message: "Thank you for Sign In",token:token});
+  res.header('Authorization',`Bearer ${token}`);
+  res.json({ message: "Thank you for Sign In"});
 }
 module.exports = { authLoginController,authSigninController,authSigninOtpController,authLoginOtpController };
