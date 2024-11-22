@@ -58,9 +58,11 @@ userSchema.pre('save', async function(next){
 })
 
 // Compare Password
-userSchema.methods.comparePassword=async(password,hashedPassword)=>{
+userSchema.methods.comparePassword=async function (password){
     try {
-        const isMatch= await bcrypt.compare(password, hashedPassword);
+        const hashedPassword = this.password;
+        // console.log(hashedPassword)
+        const isMatch= await bcrypt.compare(password,hashedPassword);
         return isMatch;
     } catch (error) {
         throw new Error('Unable to resolve password');
@@ -69,8 +71,9 @@ userSchema.methods.comparePassword=async(password,hashedPassword)=>{
 
 // Json Web Token
 userSchema.methods.generateJsonWebToken =async function (){
+    // console.log(this._id)
     try {
-        return jwt.sign({
+        const token =jwt.sign({
             userId:this._id.toString(),
             email:this.email,
             name:this.name,
@@ -79,6 +82,7 @@ userSchema.methods.generateJsonWebToken =async function (){
       process.env.JWT_SECRET_KEY,
         { expiresIn: '1h' }
     );
+    return token;
     } catch (error) {
         throw new Error('Unable to generate JWT');
     }

@@ -15,10 +15,10 @@ const authLoginController = async (req, res) => {
 
 const authLoginOtpController = async(req, res) =>{
   try {
-    const options = { expiresIn: 50*6 , issuer:'foxboro-api',audience:'consumer' };
-    const token=jwt.sign(req.body,process.env.JWT_SECRET_KEY,options);
+    const user = await User.findOne({email:req.session.loggedInUserEmail}).select({password:0});
+    const token=await user.generateJsonWebToken();
     res.header('Authorization',`Bearer ${token}`);
-    res.json({ message: "Thank you for Log In"});
+    res.json({ message: "Thank you for Log In",token:token});
   } catch (error) {
     new Error("Error while logging in",404);
   }
@@ -39,9 +39,8 @@ const authSigninController=async(req, res) => {
 const authSigninOtpController=async(req,res)=>{
   const newUser = await User(req.session.user);
   await newUser.save();
-  const options = { expiresIn: 50*6 , issuer:'foxboro-api',audience:'consumer' };
-  const token=jwt.sign(req.body,process.env.JWT_SECRET_KEY,options);
+  const token = await newUser.generateJsonWebToken();
   res.header('Authorization',`Bearer ${token}`);
-  res.json({ message: "Thank you for Sign In"});
+  res.json({ message: "Thank you for Sign In", isAdmin: false,token:token });
 }
 module.exports = { authLoginController,authSigninController,authSigninOtpController,authLoginOtpController };

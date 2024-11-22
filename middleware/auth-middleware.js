@@ -1,7 +1,7 @@
 const {loginSchema,signupSchema,otpSchema}=require('../Schema');
 const User =require('../models/users');
 const Otp = require('../models/otp');
-
+const jwt=require('jsonwebtoken');
 
 // Middleware to validate user input
 const validateLoginUser=async(req,res,next)=>{
@@ -12,7 +12,8 @@ const validateLoginUser=async(req,res,next)=>{
     else{
         const {email,password}=req.body;
         const user = await User.findOne({email});
-        if(user&&user.comparePassword(password,user.password)){
+        const isValidPassword=await user.comparePassword(password);
+        if(user&&isValidPassword){
            next();
         }
         else{
@@ -38,20 +39,22 @@ const vaildateSigninUser=async(req,res,next)=>{
 
 const validateToken = async(req,res,next)=>{
   // Validate JWT token here
-  
-  try{
+  try {
     const token=req.header('Authorization').replace("Bearer ","").trim();
-    if(!token){
-      return res.status(401).json({message:"No token provided"});
+    const jwtVerified= jwt.verify(token,process.env.JWT_SECRET_KEY);
+    if (jwtVerified) {
+    const user=await User.findById(jwtVerified.userId).select({password:0});
+    req.session.verifiedUser=user;
+    req.session.verifiedToken=token;
+    req.session.verifiedId=user._id;
+    next(); 
+    } else {
+      throw new Error("Token has been expired please login again")
     }
-    console.log( jwt.verify(token,process.env.JWT_SECRET_KEY));
-
-    if(decoded) next();
-    else return res.status(401).json({message:"Invalid JWT token"});
-  }catch(e){
-    return res.status(401).json({error:"Something Broken"});
+  } catch (error) {
+    // console.log('hello')
+    res.status(400).json({message:"Might be you are not having access of admin"});
   }
-
 }
 
 
@@ -74,12 +77,7 @@ const validateOTP=async(req,res,next)=>{
   }
   else{
       const userOtp=req.body.otp;
-      
-      const mongoOtp = await Otp.findOne(
-        {
-          otp:userOtp,
-        }
-      );
+      const mongoOtp = await Otp.findOne({otp:userOtp,});
     if(mongoOtp){
       next();
     }
@@ -92,7 +90,8 @@ const validateOTP=async(req,res,next)=>{
 const validateAdmin=async(req,res,next)=>{
   const adminUser = await User.findOne({email:req.body.email});
   if(adminUser.isAdmin){
-    res.redirect("/api/v1/admin");
+    const token = await adminUser.generateJsonWebToken();
+    res.json({token:token});
   }
   else{
     next();
