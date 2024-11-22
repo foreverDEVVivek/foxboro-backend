@@ -111,7 +111,7 @@ const signupSchema = Joi.object({
 
   email: Joi.string()
     .required()
-    .min(8)
+    .min(13)
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net", "org"] } })
     .max(255),
 

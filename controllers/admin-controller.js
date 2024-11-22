@@ -44,8 +44,27 @@ const adminPostProduct=async(req,res) => {
 
 };
 
-
 const adminDeleteProduct=async (req,res)=>{
-   res.json({message: 'Product deleted successfully',})
+  const {_id}=req.body;
+  const deletedProduct=await Product.findByIdAndDelete(_id);
+  res.json({message: 'Product deleted successfully', product: deletedProduct});
 }
-module.exports = {adminGetProducts,adminPostProduct,adminDeleteProduct};
+
+
+const adminGetUsers=async (req,res)=>{
+  const allUsers= await User.find({});
+  res.json({user: allUsers});
+}
+
+const adminDeleteUsers=async (req,res)=>{
+  const {_id}=req.body;
+  const deletedUser=await User.findByIdAndDelete(_id);
+  res.json({message: 'User deleted successfully', user: deletedUser});
+}
+
+const adminUpdateUsers=async (req,res)=>{
+  const {_id,name,email,password}=req.body;
+  const updatedUser=await User.findByIdAndUpdate(_id,{name,email,password});
+  res.json({message: 'User updated successfully', user: updatedUser});
+}
+module.exports = {adminGetProducts,adminPostProduct,adminDeleteProduct,adminGetUsers,adminDeleteUsers,adminUpdateUsers};

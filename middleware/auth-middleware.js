@@ -10,20 +10,26 @@ const validateLoginUser=async(req,res,next)=>{
         next(new Error(error.message,404));
     }
     else{
+      try {
         const {email,password}=req.body;
         const user = await User.findOne({email});
-        const isValidPassword=await user.comparePassword(password);
+        let isValidPassword;
+        if(user) isValidPassword=await user.comparePassword(password);
+        else next(new Error("Invalid Credentials",404));
         if(user&&isValidPassword){
            next();
         }
         else{
           next(new Error("Invalid Credentials",404)); 
         }
+    }catch(error){
+      next(new Error('Unable to login'));
     }
+  }
 }
 
 // Middleware to authenticate user at sign in
-const vaildateSigninUser=async(req,res,next)=>{
+const validateSigninUser=async(req,res,next)=>{
     let {error}= signupSchema.validate(req.body);
     if(error){
       next(new Error(error.message,400))
@@ -57,18 +63,6 @@ const validateToken = async(req,res,next)=>{
   }
 }
 
-
-const validateUserOtp=async(req,res,next)=>{
-  //Checking user is generating otp code only once at a time
-  const existingUserOtp = await Otp.findOne({email:req.body.email});
-  if(existingUserOtp){
-    return res.status(404).json({message:"You have already requested for Otp please wait ...."});
-  }
-  else{
-    next();
-  }
-}
-
 const validateOTP=async(req,res,next)=>{
   //Validate OTP Here
   const {error}= otpSchema.validate(req.body);
@@ -78,17 +72,13 @@ const validateOTP=async(req,res,next)=>{
   else{
       const userOtp=req.body.otp;
       const mongoOtp = await Otp.findOne({otp:userOtp,});
-    if(mongoOtp){
-      next();
-    }
-    else{
-        next(new Error("OTP is incorrect!",404));
-    }
+      if(mongoOtp) next();
+      else next(new Error("OTP is incorrect!",404));
   }
 };
 
 const validateAdmin=async(req,res,next)=>{
-  const adminUser = await User.findOne({email:req.body.email});
+  const adminUser = await User.findOne({email:req.body.email}).select({password:0});
   if(adminUser.isAdmin){
     const token = await adminUser.generateJsonWebToken();
     res.json({token:token});
@@ -98,4 +88,4 @@ const validateAdmin=async(req,res,next)=>{
   }
 }
 
-module.exports={validateLoginUser,vaildateSigninUser,validateOTP,validateUserOtp,validateAdmin,validateToken};
+module.exports={validateLoginUser,validateSigninUser,validateOTP,validateAdmin,validateToken};

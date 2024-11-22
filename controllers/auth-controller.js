@@ -25,15 +25,9 @@ const authLoginOtpController = async(req, res) =>{
 }
 
 const authSigninController=async(req, res) => {
-  const existingUserOtp = await Otp.findOne({email:req.body.email});
-  if(existingUserOtp){
-    return res.status(404).json({message:"You have already requested for Otp please wait 10 min...."});
-  }
-  else{
   sendOtp(req.body.email);
   req.session.user=req.body;
   res.json({ message: "Sign In Successful! OTP Sent" });
-}
 }
 
 const authSigninOtpController=async(req,res)=>{

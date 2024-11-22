@@ -3,12 +3,10 @@ const express=require('express');
 const app=express();
 require('dotenv').config();
 
-
 app.use(config.session(config.sessionConfig));
 app.use(config.methodOverride('_method'));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(express.static(config.path.join(__dirname, 'public')));
 //Authentication Router
 app.use('/api/v1/auth', config.authRouter);
 
@@ -29,4 +27,4 @@ app.listen(80, () => {
         console.log("DB Error: " + err);
     })    
     console.log('Server is running on port 80');
-})
+});
