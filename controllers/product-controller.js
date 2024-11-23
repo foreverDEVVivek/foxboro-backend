@@ -1,7 +1,6 @@
 const Product = require('../models/products.js');
 
 //Product Controllers are here
-
 const getAllProducts = async (req, res) => {
     try {
         const products = await Product.find({});

@@ -1,16 +1,31 @@
-const adminRouter=require('express').Router();
-const {validateToken}=require('../middleware/auth-middleware');
-const adminController = require('../controllers/admin-controller');
+const adminRouter = require("express").Router();
+const { validateToken } = require("../middleware/auth-middleware");
+const validateProduct = require("../middleware/product-middleware.js");
+const adminController = require("../controllers/admin-controller");
+const multer = require("multer");
+const {storage}=require('../config.js')
+const upload = multer({storage})
 
-adminRouter.route('/products')
-.get(validateToken,adminController.adminGetProducts)
-.post(validateToken,adminController.adminPostProduct)
-.delete(validateToken,adminController.adminDeleteProduct)
+//upload.single('productImages[image]')
+// Admin routes to handle admin-specific operations like get all products and list new products
+adminRouter
+  .route("/products")
+  .get(validateToken, adminController.adminGetProducts)
+  .post(validateToken, validateProduct, adminController.adminPostProduct);
 
-adminRouter.route('/users')
-.get(validateToken,adminController.adminGetUsers)
-.delete(validateToken,adminController.adminDeleteUsers)
-.put(validateToken,adminController.adminUpdateUsers)
+//Update products or delete products
+adminRouter
+  .route("/products/:productId")
+  .put(validateToken,adminController.adminUpdateProduct)
+  .delete(validateToken, adminController.adminDeleteProduct);
 
+// Admin routes to handle admin-specific operations like get all Users
+adminRouter.route("/users").get(validateToken, adminController.adminGetUsers);
 
-module.exports=adminRouter;
+// Admin routes to handle admin-specific operations like delete Users and update users
+adminRouter
+  .route("/users/:userId")
+  .delete(validateToken, adminController.adminDeleteUsers)
+  .put(validateToken, adminController.adminUpdateUsers);
+
+module.exports = adminRouter;

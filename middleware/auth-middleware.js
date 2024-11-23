@@ -59,7 +59,7 @@ const validateToken = async(req,res,next)=>{
     }
   } catch (error) {
     // console.log('hello')
-    res.status(400).json({message:"Might be you are not having access of admin"});
+    res.status(400).json({message:"Something Broken! Try Again Later"});
   }
 }
 
@@ -81,7 +81,7 @@ const validateAdmin=async(req,res,next)=>{
   const adminUser = await User.findOne({email:req.body.email}).select({password:0});
   if(adminUser.isAdmin){
     const token = await adminUser.generateJsonWebToken();
-    res.json({token:token});
+    res.json({token:token,message:"Your are admin",isAdmin:true});
   }
   else{
     next();

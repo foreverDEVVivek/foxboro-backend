@@ -81,6 +81,7 @@
 
 
 const Joi = require("joi");
+const { default: mongoose } = require("mongoose");
 
 const loginSchema = Joi.object({
   email: Joi.string()
@@ -147,7 +148,56 @@ const otpSchema= Joi.object({
     .messages({
       "string.pattern.base": "OTP must be 6 digits.",
     }),
-
 })
-module.exports = { loginSchema, signupSchema, otpSchema };
+
+//Product Schema 
+
+// Joi Schema for Category
+const categorySchema = Joi.object({
+  name: Joi.string()
+    .valid("Machinery and Equipment", "Chemical Products", "Electrical Components")
+    .required(),
+  description: Joi.string().required(),
+});
+
+// Joi Schema for Sub-Category
+const subCategorySchema = Joi.object({
+  name: Joi.string()
+    .valid("Construction Machinery", "Industrial Chemicals", "Semiconductors")
+    .required(),
+  description: Joi.string().min(10).required(),
+});
+
+// Joi Schema for Manufacturer
+const manufacturerSchema = Joi.object({
+  name: Joi.string().min(3).required(),
+});
+
+// Joi Schema for Product
+const productSchema = Joi.object({
+  name: Joi.string().min(3).required(),
+  price: Joi.number().required(),
+  manufacturer: manufacturerSchema, // Nested Manufacturer Validation
+  shortDescription: Joi.string().min(10).required(),
+  quantity: Joi.number().min(1).required(),
+  category: categorySchema, // Nested Category Validation
+  subCategory: subCategorySchema, // Nested Sub-Category Validation
+  image: Joi.array().items(Joi.string().uri()).min(1).required(),
+  modelNo: Joi.string().min(3).required(),
+  keyFactors: Joi.array().items(Joi.string()).min(1).required(),
+  inrPrice: Joi.number().min(0).required(),
+  usdPrice: Joi.number().min(0).required(),
+  stock: Joi.number().min(0).max(10000).required(),
+  specifications: Joi.array().items(Joi.string()).min(1).required(),
+  longDescription: Joi.string().required(),
+  GstRate: Joi.number().min(0).max(100).required(),
+  moq: Joi.number().min(1).max(10000).required(),
+  paymentType: Joi.array()
+    .items(Joi.string().valid("Cash on Delivery", "Online Payment"))
+    .min(1)
+    .required(),
+});
+
+
+module.exports = { loginSchema, signupSchema, otpSchema, productSchema };
 
