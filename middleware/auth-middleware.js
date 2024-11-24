@@ -1,4 +1,4 @@
-const {loginSchema,signupSchema,otpSchema}=require('../Schema');
+const {loginSchema,signupSchema,otpSchema}=require('../validation/Schema');
 const User =require('../models/users');
 const Otp = require('../models/otp');
 const jwt=require('jsonwebtoken');

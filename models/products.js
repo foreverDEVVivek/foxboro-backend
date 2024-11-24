@@ -40,6 +40,48 @@ const manufacturerSchema = mongoose.Schema({
   },
 });
 
+//Separate Associated Vendor Schema
+const vendorSchema = mongoose.Schema({
+   company:{
+    type:String,
+    required:true,
+    minlength: 3,
+   },
+   address:{
+    type: String,
+    required:true,
+    minlength: 10,
+   },
+   concernedPerson:{
+    type: String,
+    required:true,
+    minlength: 3,
+   },
+   phoneNumber:{
+    type: String,
+    match: [/^[0-9]{10}$/, 'Phone number must be 10 digits.'],
+    required: false
+   },
+   mobileNumber:{
+    type: String,
+    match: [/^[0-9]{10}$/, 'Phone number must be 10 digits.'],
+    required: false
+   },
+   email:{
+    type:String,
+    match: [/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/, 'Email must be a valid Email.'],
+    required:true,
+   },
+   lastPurchasedDate:{
+    type: Date,
+    required: true,
+   },
+   lastPurchasedPrice:{
+    type: Number,
+    required: true,
+   }
+});
+
 //Product Schema
 const productsSchema = mongoose.Schema({
   name: {
@@ -54,6 +96,10 @@ const productsSchema = mongoose.Schema({
   manufacturer: {
     type: manufacturerSchema,
     default: () => ({}),
+  },
+  vendors:{
+    type: [vendorSchema],
+    default: [],
   },
   shortDescription: {
     type: String,

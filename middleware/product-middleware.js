@@ -1,4 +1,4 @@
-const {productSchema}=require("../Schema.js");
+const {productSchema}=require("../validation/Schema.js");
 
 // Middleware to validate product data
 const validateProduct=async (req,res,next)=>{

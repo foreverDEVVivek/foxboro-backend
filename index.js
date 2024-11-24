@@ -1,8 +1,9 @@
-const config =require('./config.js');
+const config =require('./config/config.js');
 const express=require('express');
 const app=express();
 require('dotenv').config();
 
+app.use(config.cors())
 app.use(config.session(config.sessionConfig));
 app.use(config.methodOverride('_method'));
 app.use(express.urlencoded({extended: true}));

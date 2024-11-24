@@ -1,14 +1,15 @@
 const path=require('path');
 const mongoose=require('mongoose');
 const MongoStore= require('connect-mongo');
-const authRouter = require('./routers/auth-router.js');
-const productRouter=require('./routers/product-router.js');
-const errorMiddleware=require('./middleware/error-middleware.js');
-const adminRouter=require('./routers/admin-router.js');
+const authRouter = require('../routers/auth-router.js');
+const productRouter=require('../routers/product-router.js');
+const errorMiddleware=require('../middleware/error-middleware.js');
+const adminRouter=require('../routers/admin-router.js');
 const cloudinary = require('cloudinary').v2;
 const {CloudinaryStorage}=require('multer-storage-cloudinary')
 const session = require('express-session');
 const methodOverride=require('method-override');
+const cors=require('cors')
 require('dotenv').config();
 
 const sessionConfig ={
@@ -46,4 +47,4 @@ async function connectMongo(){
     await mongoose.connect(process.env.MONGO_DB_URL);
 }
 
-module.exports ={cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};
+module.exports ={cors,cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};

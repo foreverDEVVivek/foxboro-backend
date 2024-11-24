@@ -11,9 +11,13 @@ const adminGetProducts=async(req,res)=>{
 
 //Post a new Product -- Admin only
 const adminPostProduct=async(req,res) => {
-    const {productName,productPrice,productManufacturer,manufacturerName,productShortDescription,productQuantity,productCategory,categoryName, categoryDescription,productSubCategory,subCategoryName,subCategoryDescription,productImages,productModelNo,productKeyFeatures,productInrPrice,productUsdPrice,productStock,productSpecification,productLongDescription,productGstRate,productMoq,productPaymentType
+    const {productName,productPrice,vendors,productManufacturer,manufacturerName,productShortDescription,productQuantity,productCategory,categoryName, categoryDescription,productSubCategory,subCategoryName,subCategoryDescription,productModelNo,productKeyFeatures,productInrPrice,productUsdPrice,productStock,productSpecification,productLongDescription,productGstRate,productMoq,productPaymentType
     }=req.body;
-
+  
+    if(!req.files || req.files.length === 0){
+      return res.status(400).json({message:"At least 4 images are required!"});
+    }
+    const imageUrls=req.files.map((file)=>{return file.path});
     //Need to work on it.
     const newProduct = await Product({
         name: productName,
@@ -22,13 +26,14 @@ const adminPostProduct=async(req,res) => {
         manufacturerName: manufacturerName,
         shortDescription: productShortDescription,
         quantity: productQuantity,
+        image:imageUrls,
+        vendors:vendors,
         category: productCategory,
         categoryName: categoryName,
         categoryDescription: categoryDescription,
         subCategory: productSubCategory,
         subCategoryName: subCategoryName,
         subCategoryDescription: subCategoryDescription,
-        images: productImages,
         modelNo: productModelNo,
         keyFeatures: productKeyFeatures,
         inrPrice: productInrPrice,
@@ -48,7 +53,7 @@ const adminPostProduct=async(req,res) => {
 };
 // Update product -- Admin only
 const adminUpdateProduct=async (req,res)=>{
-  const  {productName,productPrice,productManufacturer,manufacturerName,productShortDescription,productQuantity,productCategory,categoryName, categoryDescription,productSubCategory,subCategoryName,subCategoryDescription,productImages,productModelNo,productKeyFeatures,productInrPrice,productUsdPrice,productStock,productSpecification,productLongDescription,productGstRate,productMoq,productPaymentType
+  const  {productName,vendors,productPrice,productManufacturer,manufacturerName,productShortDescription,productQuantity,productCategory,categoryName, categoryDescription,productSubCategory,subCategoryName,subCategoryDescription,productImages,productModelNo,productKeyFeatures,productInrPrice,productUsdPrice,productStock,productSpecification,productLongDescription,productGstRate,productMoq,productPaymentType
   }=req.body;
  
   const {productId}=req.params;
@@ -59,6 +64,7 @@ const adminUpdateProduct=async (req,res)=>{
     manufacturerName: manufacturerName,
     shortDescription: productShortDescription,
     quantity: productQuantity,
+    vendors:vendors,
     category: productCategory,
     categoryName: categoryName,
     categoryDescription: categoryDescription,

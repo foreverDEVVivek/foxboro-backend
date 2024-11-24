@@ -173,16 +173,27 @@ const manufacturerSchema = Joi.object({
   name: Joi.string().min(3).required(),
 });
 
+//Joi Schema for Vendors
+const vendorSchema= Joi.object({
+  company:Joi.string().required().min(4),
+  address:Joi.string().required().min(5),
+  contactNumber:Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
+  email: Joi.string().email().required(),
+  phoneNumber: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
+  concernedPerson: Joi.string().required().min(4),
+  lastPurchaseDate: Joi.date().required(),
+  lastPurchasedPrice: Joi.number().required(),
+});
 // Joi Schema for Product
 const productSchema = Joi.object({
   name: Joi.string().min(3).required(),
   price: Joi.number().required(),
-  manufacturer: manufacturerSchema, // Nested Manufacturer Validation
+  manufacturer: manufacturerSchema,
+  vendors:[vendorSchema], // Nested Manufacturer Validation
   shortDescription: Joi.string().min(10).required(),
   quantity: Joi.number().min(1).required(),
   category: categorySchema, // Nested Category Validation
   subCategory: subCategorySchema, // Nested Sub-Category Validation
-  image: Joi.array().items(Joi.string().uri()).min(1).required(),
   modelNo: Joi.string().min(3).required(),
   keyFactors: Joi.array().items(Joi.string()).min(1).required(),
   inrPrice: Joi.number().min(0).required(),
