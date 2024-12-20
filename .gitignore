@@ -1,6 +1,5 @@
 node_modules/
 .env
 init/
-
-# Local Netlify folder
+.rmv/
 .netlify

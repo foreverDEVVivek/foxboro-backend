@@ -11,7 +11,7 @@ const upload = multer({storage}).array('images',4)
 adminRouter
   .route("/products")
   .get(validateToken, adminController.adminGetProducts)
-  .post(validateToken, validateProduct, upload, adminController.adminPostProduct);
+  .post(validateToken,  upload,validateProduct, adminController.adminPostProduct);
 
 //Update products or delete products
 adminRouter

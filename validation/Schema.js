@@ -207,8 +207,7 @@ const productSchema = Joi.object({
     .items(Joi.string().valid("Cash on Delivery", "Online Payment"))
     .min(1)
     .required(),
-});
-
+}).required();
 
 module.exports = { loginSchema, signupSchema, otpSchema, productSchema };
 
