@@ -2,6 +2,7 @@ const jwt =require('jsonwebtoken');
 const sendOtp=require('../utils/send-mailer.js');
 const User=require('../models/users');
 const Otp = require('../models/otp');
+const { createTestAccount } = require('nodemailer');
 
 const authLoginController = async (req, res) => {
   try {
@@ -25,16 +26,25 @@ const authLoginOtpController = async(req, res) =>{
 }
 
 const authSigninController=async(req, res) => {
-  sendOtp(req.body.email);
-  req.session.user=req.body;
-  res.json({ message: "Sign In Successful! OTP Sent" });
-}
+  try {
+    sendOtp(req.body.email);
+    req.session.user=req.body;
+    res.json({ message: "Sign In Successful! OTP Sent" });
+    
+  } catch (error) {
+      res.status(404).json({ message: "Something went wrong Try again after 10 minutes!"});    
+  }
+  }
 
 const authSigninOtpController=async(req,res)=>{
+   try {
   const newUser = await User(req.session.user);
   await newUser.save();
   const token = await newUser.generateJsonWebToken();
   res.header('Authorization',`Bearer ${token}`);
   res.json({ message: "Thank you for Sign In", isAdmin: false,token:token });
+   } catch (error) {
+    res.status(403).json({message:error.message, success:false})
+   }
 }
 module.exports = { authLoginController,authSigninController,authSigninOtpController,authLoginOtpController };

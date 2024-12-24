@@ -78,8 +78,10 @@ userSchema.methods.generateJsonWebToken =async function (){
             email:this.email,
             name:this.name,
             phone:this.phone,
+            isAdmin:this.isAdmin,
         },
-      process.env.JWT_SECRET_KEY,
+
+        process.env.JWT_SECRET_KEY,
         { expiresIn: '1h' }
     );
     return token;

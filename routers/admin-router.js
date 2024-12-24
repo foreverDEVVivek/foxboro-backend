@@ -1,18 +1,16 @@
 const adminRouter = require("express").Router();
 const { validateToken } = require("../middleware/auth-middleware");
-const validateProduct = require("../middleware/product-middleware.js");
 const adminController = require("../controllers/admin-controller");
+const validateProduct = require("../middleware/product-middleware.js");
 const multer = require("multer");
-const {storage}=require('../config/config.js')
+const {storage}=require('../config/cloudinaryConfig.js')
 const upload = multer({storage}).array('images',4)
 
-//upload.single('productImages[image]')
-// Admin routes to handle admin-specific operations like get all products and list new products
 adminRouter
   .route("/products")
   .get(validateToken, adminController.adminGetProducts)
-  .post(validateToken,  upload,validateProduct, adminController.adminPostProduct);
-
+  .post(validateToken,upload,validateProduct,adminController.adminPostProduct); 
+  
 //Update products or delete products
 adminRouter
   .route("/products/:productId")

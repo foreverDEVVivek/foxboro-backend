@@ -3,11 +3,12 @@ const express=require('express');
 const app=express();
 require('dotenv').config();
 
-app.use(config.cors())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(config.cors({origin:"*"}))
 app.use(config.session(config.sessionConfig));
 app.use(config.methodOverride('_method'));
-app.use(express.urlencoded({extended: true}));
-app.use(express.json());
 //Authentication Router
 app.use('/api/v1/auth', config.authRouter);
 

@@ -150,7 +150,64 @@ const otpSchema= Joi.object({
     }),
 })
 
-//Product Schema 
+// //Product Schema 
+
+// // Joi Schema for Category
+// const categorySchema = Joi.object({
+//   name: Joi.string()
+//     .valid("Machinery and Equipment", "Chemical Products", "Electrical Components")
+//     .required(),
+//   description: Joi.string().required(),
+// });
+
+// // Joi Schema for Sub-Category
+// const subCategorySchema = Joi.object({
+//   name: Joi.string()
+//     .valid("Construction Machinery", "Industrial Chemicals", "Semiconductors")
+//     .required(),
+//   description: Joi.string().min(10).required(),
+// });
+
+// // Joi Schema for Manufacturer
+// const manufacturerSchema = Joi.object({
+//   name: Joi.string().min(3).required(),
+// });
+
+// //Joi Schema for Vendors
+// const vendorSchema= Joi.object({
+//   company:Joi.string().required().min(4),
+//   address:Joi.string().required().min(5),
+//   contactNumber:Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
+//   email: Joi.string().email().required(),
+//   phoneNumber: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
+//   concernedPerson: Joi.string().required().min(4),
+//   lastPurchaseDate: Joi.date().required(),
+//   lastPurchasedPrice: Joi.number().required(),
+// });
+// // Joi Schema for Product
+// const productSchema = Joi.object({
+//   name: Joi.string().min(3).required(),
+//   price: Joi.number().required(),
+//   manufacturer: manufacturerSchema,
+//   vendors:[vendorSchema], // Nested Manufacturer Validation
+//   shortDescription: Joi.string().min(10).required(),
+//   quantity: Joi.number().min(1).required(),
+//   category: categorySchema, // Nested Category Validation
+//   subCategory: subCategorySchema, // Nested Sub-Category Validation
+//   modelNo: Joi.string().min(3).required(),
+//   keyFactors: Joi.array().items(Joi.string()).min(1).required(),
+//   inrPrice: Joi.number().min(0).required(),
+//   usdPrice: Joi.number().min(0).required(),
+//   stock: Joi.number().min(0).max(10000).required(),
+//   specifications: Joi.array().items(Joi.string()).min(1).required(),
+//   longDescription: Joi.string().required(),
+//   GstRate: Joi.number().min(0).max(100).required(),
+//   moq: Joi.number().min(1).max(10000).required(),
+//   paymentType: Joi.array()
+//     .items(Joi.string().valid("Cash on Delivery", "Online Payment"))
+//     .min(1)
+//     .required(),
+// }).required();
 
 // Joi Schema for Category
 const categorySchema = Joi.object({
@@ -173,39 +230,57 @@ const manufacturerSchema = Joi.object({
   name: Joi.string().min(3).required(),
 });
 
-//Joi Schema for Vendors
-const vendorSchema= Joi.object({
-  company:Joi.string().required().min(4),
-  address:Joi.string().required().min(5),
-  contactNumber:Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
+// Joi Schema for Vendors
+const vendorSchema = Joi.object({
+  company: Joi.string().required().min(4),
+  address: Joi.string().required().min(5),
+  contactNumber: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
   email: Joi.string().email().required(),
   phoneNumber: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
   concernedPerson: Joi.string().required().min(4),
-  lastPurchaseDate: Joi.date().required(),
+  lastPurchaseDate: Joi.date().iso().required(), // ISO date format for multipart
   lastPurchasedPrice: Joi.number().required(),
 });
+
 // Joi Schema for Product
 const productSchema = Joi.object({
   name: Joi.string().min(3).required(),
   price: Joi.number().required(),
-  manufacturer: manufacturerSchema,
-  vendors:[vendorSchema], // Nested Manufacturer Validation
+  manufacturer: manufacturerSchema, // Nested Manufacturer Validation
+  vendors: Joi.array().items(vendorSchema).required(), // Nested Vendor Validation
   shortDescription: Joi.string().min(10).required(),
   quantity: Joi.number().min(1).required(),
   category: categorySchema, // Nested Category Validation
   subCategory: subCategorySchema, // Nested Sub-Category Validation
   modelNo: Joi.string().min(3).required(),
-  keyFactors: Joi.array().items(Joi.string()).min(1).required(),
-  inrPrice: Joi.number().min(0).required(),
-  usdPrice: Joi.number().min(0).required(),
+  keyFactors: Joi.string() // Comma-separated values for array
+    .custom((value, helpers) => {
+      const factors = value.split(",").map((item) => item.trim());
+      if (!factors.length) return helpers.error("any.invalid");
+      return factors;
+    })
+    .required(),
+  inrPrice: Joi.number().required(),
+  usdPrice: Joi.number().required(),
   stock: Joi.number().min(0).max(10000).required(),
-  specifications: Joi.array().items(Joi.string()).min(1).required(),
+  specifications: Joi.string() // Comma-separated values for array
+    .custom((value, helpers) => {
+      const specs = value.split(",").map((item) => item.trim());
+      if (!specs.length) return helpers.error("any.invalid");
+      return specs;
+    })
+    .required(),
   longDescription: Joi.string().required(),
   GstRate: Joi.number().min(0).max(100).required(),
   moq: Joi.number().min(1).max(10000).required(),
-  paymentType: Joi.array()
-    .items(Joi.string().valid("Cash on Delivery", "Online Payment"))
-    .min(1)
+  paymentType: Joi.string() // Comma-separated values for array
+    .custom((value, helpers) => {
+      const types = value.split(",").map((item) => item.trim());
+      const validTypes = ["Cash on Delivery", "Online Payment"];
+      const isValid = types.every((type) => validTypes.includes(type));
+      if (!isValid) return helpers.error("any.invalid");
+      return types;
+    })
     .required(),
 }).required();
 

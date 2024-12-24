@@ -12,27 +12,7 @@ const adminGetProducts = async (req, res) => {
 //Post a new Product -- Admin only
 const adminPostProduct = async (req, res) => {
   try {
-    const {
-      name,  // productName in Joi schema
-      price, // productPrice in Joi schema
-      manufacturer,
-      vendors,
-      shortDescription, // productShortDescription in Joi schema
-      quantity, // productQuantity in Joi schema
-      category,
-      subCategory, // productSubCategory in Joi schema
-      modelNo, // productModelNo in Joi schema
-      keyFactors, // productKeyFeatures in Joi schema
-      inrPrice, // productInrPrice in Joi schema
-      usdPrice, // productUsdPrice in Joi schema
-      stock, // productStock in Joi schema
-      specifications, // productSpecification in Joi schema
-      longDescription, // productLongDescription in Joi schema
-      GstRate, // productGstRate in Joi schema
-      moq, // productMoq in Joi schema
-      paymentType, // productPaymentType in Joi schema
-    } = req.body;
-
+   
     // Ensure that at least 4 images are uploaded
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "At least 4 images are required!" });
@@ -43,8 +23,57 @@ const adminPostProduct = async (req, res) => {
       return file.path;
     });
 
+    // const productData = {
+    //   name: "Industrial Drill Machine",
+    //   price: 50000,
+    //   manufacturer: {
+    //     name: "DrillTech Ltd."
+    //   },
+    //   vendors: [
+    //     {
+    //       company: "Tools Supplier Co.",
+    //       address: "123 Industrial Road, City",
+    //       concernedPerson: "John Doe",
+    //       phoneNumber: "9876543210",
+    //       mobileNumber: "9876543210",
+    //       email: "contact@toolssupplier.com",
+    //       lastPurchasedDate: "2024-11-01",
+    //       lastPurchasedPrice: 48000
+    //     }
+    //   ],
+    //   shortDescription: "A high-quality industrial drill machine for various tasks.",
+    //   quantity: 50,
+    //   category: {
+    //     name: "Machinery and Equipment",
+    //     description: "Heavy machinery used in industrial operations."
+    //   },
+    //   subCategory: {
+    //     name: "Construction Machinery",
+    //     description: "Machines used for construction purposes, such as drills, cranes, and mixers."
+    //   },
+    //   review: [], // Assuming no reviews are associated yet
+    //   image:imageUrls, 
+    //   modelNo: "IDM-4500",
+    //   keyFactors: ["Durable", "High Efficiency", "Affordable"],
+    //   inrPrice: 50000,
+    //   usdPrice: 600,
+    //   stock: 50,
+    //   specifications: [
+    //     "Max Power: 5 HP",
+    //     "Voltage: 220V",
+    //     "Speed: 1500 RPM"
+    //   ],
+    //   longDescription:
+    //     "This drill machine is built to last, providing powerful performance for industrial applications. It features advanced safety features and energy-efficient technology.",
+    //   GstRate: 18,
+    //   moq: 5,
+    //   paymentType: ["Cash on Delivery", "Online Payment"]
+    // };
+    
+
     // Create a new product object based on the Joi schema fields
-    const newProduct = await Product({
+   
+     const newProduct = await Product({
       name,  // Matches Joi schema for product name
       price, // Matches Joi schema for product price
       manufacturer, // Matches Joi schema for manufacturer
@@ -66,11 +95,11 @@ const adminPostProduct = async (req, res) => {
       paymentType, // Matches Joi schema for payment type
       createdAt: Date.now(),
     });
-
+    const product= await Product(newProduct);
     // Save the new product to the database
-    await newProduct.save();
+    await product.save();
 
-    res.json({ message: "Product added successfully", product: newProduct });
+    res.json({ message: "Product added successfully", product: product });
   } catch (error) {
     res.json({ message: error.message, success: false });
   }
