@@ -5,8 +5,8 @@ const Otp = require('../models/otp.js');
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",  
     auth: {
-      user: "spareg1234@gmail.com",
-      pass:"fqxv lqmb ekus mxby",
+      user: process.env.SENDER,
+      pass:process.env.APP_KEY,
     },
 });
 
