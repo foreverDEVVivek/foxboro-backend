@@ -1,5 +1,5 @@
 const Product = require('../models/products.js');
-
+const Banner = require('../models/banner.js')
 //Product Controllers are here
 const getAllProducts = async (req, res) => {
     try {
@@ -20,4 +20,14 @@ const getProduct = async (req,res)=>{
     }
 }
 
-module.exports = {getAllProducts,getProduct}
+const getBannerImages = async(req,res)=>{
+    try {
+        const allBanners = await Banner.find({});
+        res.json({ banner: allBanners,success:true});        
+    } catch (error) {
+        res.status(404).json({message:error.message, success:false});
+    }
+
+}
+
+module.exports = {getAllProducts,getProduct,getBannerImages}

@@ -234,11 +234,11 @@ const manufacturerSchema = Joi.object({
 const vendorSchema = Joi.object({
   company: Joi.string().required().min(4),
   address: Joi.string().required().min(5),
-  contactNumber: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
+  mobileNumber: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
   email: Joi.string().email().required(),
   phoneNumber: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
   concernedPerson: Joi.string().required().min(4),
-  lastPurchaseDate: Joi.date().iso().required(), // ISO date format for multipart
+  lastPurchaseDate: Joi.string().required(), // ISO date format for multipart
   lastPurchasedPrice: Joi.number().required(),
 });
 

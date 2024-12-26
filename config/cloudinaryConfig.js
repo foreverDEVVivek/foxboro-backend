@@ -18,4 +18,11 @@ const storage = new CloudinaryStorage({
   },
 });
 
-module.exports = { cloudinary, storage };
+const bannerStorage = new CloudinaryStorage({
+  cloudinary : cloudinary,
+  params:{
+    folder:'Foxboro-backend/banners',
+    allowed_formats: ['jpg', 'png', 'jpeg','avif'], // Acceptable formats
+  }
+})
+module.exports = { cloudinary, storage ,bannerStorage};

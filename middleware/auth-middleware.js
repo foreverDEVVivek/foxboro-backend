@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 
 // Middleware to validate user input
 const validateLoginUser = async (req, res, next) => {
+
   let { error } = loginSchema.validate(req.body);
   if (error) {
     next(new Error(error.message, 404));
@@ -49,37 +50,46 @@ const validateSigninUser = async (req, res, next) => {
 };
 
 const validateToken = async (req, res, next) => {
-  
   // Validate JWT token here
   try {
-    if(!req.header('Authorization')){      res.status(403).json({ message:"No Token Provided", success: false });}
-    else{
-    const token = req.header("Authorization").replace("Bearer ", "").trim();
-    if (!token) throw new Error("No token provided");
-     
-    const jwtVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    if (!req.header("Authorization")) {
+      res.status(403).json({ message: "No Token Provided", success: false });
+    } else {
+      const token = req.header("Authorization").replace("Bearer ", "").trim();
+      if (!token) throw new Error("No token provided");
 
-    if (!jwtVerified.isAdmin) {
-      throw new Error("You are not authorized to access this page ");
+      const jwtVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+      if (!jwtVerified.isAdmin) {
+        throw new Error("You are not authorized to access this page ");
+      }
+
+      const user = await User.findById(jwtVerified.userId).select({
+        password: 0,
+      });
+      if (!user) throw new Error("User not found");
+
+      req.session.verifiedUser = user;
+      req.session.verifiedToken = token;
+      req.session.verifiedId = user._id;
+      next();
     }
-  
-    const user = await User.findById(jwtVerified.userId).select({ password: 0 });
-    if (!user) throw new Error("User not found");
-  
-    req.session.verifiedUser = user;
-    req.session.verifiedToken = token;
-    req.session.verifiedId = user._id;
-    next();
-  }
   } catch (error) {
     if (error.message === "No token provided") {
       res.status(401).json({ message: "Authentication token is missing." });
-    } else if (error.message === "You are not authorized to access this page ") {
+    } else if (
+      error.message === "You are not authorized to access this page "
+    ) {
       res.status(403).json({ message: "Access denied." });
-    } else if (error.message === "jwt malformed" || error.message === "invalid signature") {
+    } else if (
+      error.message === "jwt malformed" ||
+      error.message === "invalid signature"
+    ) {
       res.status(401).json({ message: "Invalid or expired token." });
     } else {
-      res.status(500).json({ message: "Internal Server Error", error: error.message });
+      res
+        .status(500)
+        .json({ message: "Internal Server Error", error: error.message });
     }
   }
 };

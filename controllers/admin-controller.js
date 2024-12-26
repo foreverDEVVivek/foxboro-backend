@@ -1,5 +1,6 @@
 const User = require("../models/users.js");
 const jwt = require("jsonwebtoken");
+const Banner= require('../models/banner.js')
 const Product = require("../models/products.js");
 const bcrypt = require("bcryptjs");
 
@@ -12,10 +13,11 @@ const adminGetProducts = async (req, res) => {
 //Post a new Product -- Admin only
 const adminPostProduct = async (req, res) => {
   try {
-   
     // Ensure that at least 4 images are uploaded
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "At least 4 images are required!" });
+      return res
+        .status(400)
+        .json({ message: "At least 4 images are required!" });
     }
 
     // Map the uploaded files to an array of image URLs
@@ -23,83 +25,34 @@ const adminPostProduct = async (req, res) => {
       return file.path;
     });
 
-    // const productData = {
-    //   name: "Industrial Drill Machine",
-    //   price: 50000,
-    //   manufacturer: {
-    //     name: "DrillTech Ltd."
-    //   },
-    //   vendors: [
-    //     {
-    //       company: "Tools Supplier Co.",
-    //       address: "123 Industrial Road, City",
-    //       concernedPerson: "John Doe",
-    //       phoneNumber: "9876543210",
-    //       mobileNumber: "9876543210",
-    //       email: "contact@toolssupplier.com",
-    //       lastPurchasedDate: "2024-11-01",
-    //       lastPurchasedPrice: 48000
-    //     }
-    //   ],
-    //   shortDescription: "A high-quality industrial drill machine for various tasks.",
-    //   quantity: 50,
-    //   category: {
-    //     name: "Machinery and Equipment",
-    //     description: "Heavy machinery used in industrial operations."
-    //   },
-    //   subCategory: {
-    //     name: "Construction Machinery",
-    //     description: "Machines used for construction purposes, such as drills, cranes, and mixers."
-    //   },
-    //   review: [], // Assuming no reviews are associated yet
-    //   image:imageUrls, 
-    //   modelNo: "IDM-4500",
-    //   keyFactors: ["Durable", "High Efficiency", "Affordable"],
-    //   inrPrice: 50000,
-    //   usdPrice: 600,
-    //   stock: 50,
-    //   specifications: [
-    //     "Max Power: 5 HP",
-    //     "Voltage: 220V",
-    //     "Speed: 1500 RPM"
-    //   ],
-    //   longDescription:
-    //     "This drill machine is built to last, providing powerful performance for industrial applications. It features advanced safety features and energy-efficient technology.",
-    //   GstRate: 18,
-    //   moq: 5,
-    //   paymentType: ["Cash on Delivery", "Online Payment"]
-    // };
-    
+    const data = {
+      name: req.body.name,
+      price: req.body.price,
+      manufacturer: JSON.parse(req.body.manufacturer),
+      vendors: JSON.parse(req.body.vendors),
+      shortDescription: req.body.shortDescription,
+      quantity: req.body.quantity,
+      category: JSON.parse(req.body.category),
+      subCategory: JSON.parse(req.body.subCategory),
+      review: JSON.parse(req.body.review),
+      modelNo: req.body.modelNo,
+      image: imageUrls,
+      keyFactors: JSON.parse(req.body.keyFactors),
+      inrPrice: req.body.inrPrice,
+      usdPrice: req.body.usdPrice,
+      stock: req.body.stock,
+      specifications: JSON.parse(req.body.specifications),
+      longDescription: req.body.longDescription,
+      GstRate: req.body.GstRate,
+      moq: req.body.moq,
+      paymentType: JSON.parse(req.body.paymentType),
+    };
 
-    // Create a new product object based on the Joi schema fields
-   
-     const newProduct = await Product({
-      name,  // Matches Joi schema for product name
-      price, // Matches Joi schema for product price
-      manufacturer, // Matches Joi schema for manufacturer
-      vendors, // Matches Joi schema for vendors
-      shortDescription, // Matches Joi schema for product short description
-      quantity, // Matches Joi schema for product quantity
-      image: imageUrls, // Image URLs from file upload
-      category, // Matches Joi schema for category (nested object)
-      subCategory, // Matches Joi schema for sub-category (nested object)
-      modelNo, // Matches Joi schema for product model number
-      keyFeatures: keyFactors, // Matches Joi schema for key features
-      inrPrice, // Matches Joi schema for INR price
-      usdPrice, // Matches Joi schema for USD price
-      stock, // Matches Joi schema for product stock
-      specification: specifications, // Matches Joi schema for product specifications
-      longDescription, // Matches Joi schema for long description
-      gstRate: GstRate, // Matches Joi schema for GST rate
-      moq, // Matches Joi schema for MOQ
-      paymentType, // Matches Joi schema for payment type
-      createdAt: Date.now(),
-    });
-    const product= await Product(newProduct);
+    const newProduct = await Product(data);
     // Save the new product to the database
-    await product.save();
+    await newProduct.save();
 
-    res.json({ message: "Product added successfully", product: product });
+    res.json({ message: "Product added successfully", product: newProduct });
   } catch (error) {
     res.json({ message: error.message, success: false });
   }
@@ -206,12 +159,48 @@ const adminUpdateUsers = async (req, res) => {
   await User.findByIdAndUpdate(userId, updatedDetails);
   res.json({ message: "User updated successfully" });
 };
+
+//Banner Change Controller
+const adminChangeBanner = async (req, res) => {
+  try {
+     // Ensure that at least 4 images are uploaded
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ message: "At least 4 images are required!" });
+  }
+
+  // Map the uploaded files to an array of image URLs
+  const imageUrls = req.files.map((file) => {
+    return file.path;
+  });
+
+  const newBanner = await Banner({
+    bannerImg:imageUrls
+  })
+  
+  await newBanner.save();
+
+  res.status(200).json({message:"Banner Images saved successfully.", success:true});
+
+  } catch (error) {
+    res.status(500).json({message:error.message, success:false});
+  }
+ 
+};
+
+const adminGetBanner= async(req,res)=>{
+  
+  const allBanners = await Banner.find({});
+  res.json({ banners: allBanners });
+}
+
 module.exports = {
   adminGetProducts,
+  adminChangeBanner,
   adminUpdateProduct,
   adminPostProduct,
   adminDeleteProduct,
   adminGetUsers,
+  adminGetBanner,
   adminDeleteUsers,
   adminUpdateUsers,
 };
