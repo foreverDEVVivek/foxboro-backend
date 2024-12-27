@@ -163,6 +163,7 @@ const adminUpdateUsers = async (req, res) => {
 //Banner Change Controller
 const adminChangeBanner = async (req, res) => {
   try {
+    const {bannerId}=req.params;
      // Ensure that at least 4 images are uploaded
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ message: "At least 4 images are required!" });
@@ -173,11 +174,9 @@ const adminChangeBanner = async (req, res) => {
     return file.path;
   });
 
-  const newBanner = await Banner({
-    bannerImg:imageUrls
-  })
+  const banner = await Banner.findById(bannerId);
   
-  await newBanner.save();
+  
 
   res.status(200).json({message:"Banner Images saved successfully.", success:true});
 
@@ -188,7 +187,6 @@ const adminChangeBanner = async (req, res) => {
 };
 
 const adminGetBanner= async(req,res)=>{
-  
   const allBanners = await Banner.find({});
   res.json({ banners: allBanners });
 }

@@ -33,7 +33,7 @@ adminRouter
 
 // Admin Routes to change the banner images
 adminRouter
-  .route("/banner")
+  .route("/banner/:bannerId")
   .get(validateToken, adminController.adminGetBanner)
   .put(
     validateToken,
