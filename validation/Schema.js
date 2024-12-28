@@ -284,5 +284,13 @@ const productSchema = Joi.object({
     .required(),
 }).required();
 
-module.exports = { loginSchema, signupSchema, otpSchema, productSchema };
+
+//validate enquiry 
+const enquirySchema = Joi.object({
+  name: Joi.string().min(3).required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
+  description: Joi.string().min(10).required(),
+})
+module.exports = { loginSchema, signupSchema, otpSchema, productSchema,enquirySchema };
 

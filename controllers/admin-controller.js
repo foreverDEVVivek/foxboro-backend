@@ -1,5 +1,6 @@
 const User = require("../models/users.js");
 const jwt = require("jsonwebtoken");
+const Enquiry = require('../models/enquiry.js')
 const Banner= require('../models/banner.js')
 const Product = require("../models/products.js");
 const bcrypt = require("bcryptjs");
@@ -174,11 +175,12 @@ const adminChangeBanner = async (req, res) => {
     return file.path;
   });
 
-  const banner = await Banner.findById(bannerId);
-  
-  
 
-  res.status(200).json({message:"Banner Images saved successfully.", success:true});
+  await Banner.findByIdAndUpdate(bannerId,{
+    bannerImg:imageUrls
+  });
+ 
+  res.status(200).json({message:"Banner Images saved successfully.", success:true, });
 
   } catch (error) {
     res.status(500).json({message:error.message, success:false});
@@ -191,9 +193,34 @@ const adminGetBanner= async(req,res)=>{
   res.json({ banners: allBanners });
 }
 
+
+//get all enquiry only admin
+const getAllEnquiries= async(req, res) => {
+  try {
+    const enquiries = await Enquiry.find({});
+    res.status(200).json({success:true, enquiries });
+  } catch (error) {
+    res.status(500).json({success:false, message: error.message });
+  }
+}
+
+//Delete enquiries
+const deleteEnquiries = async(req,res)=>{
+  try {
+    const {enquiryId}=req.params;
+    const deletedEnquiry = await Enquiry.findByIdAndDelete(enquiryId);
+
+    res.status(200).json({success:true, message: "Enquiry deleted successfully.", deletedEnquiry});
+  } catch (error) {
+    res.status(500).json({success:false, message: error.message});
+  }
+}
+
 module.exports = {
   adminGetProducts,
   adminChangeBanner,
+  getAllEnquiries,
+  deleteEnquiries,
   adminUpdateProduct,
   adminPostProduct,
   adminDeleteProduct,

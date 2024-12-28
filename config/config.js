@@ -6,6 +6,7 @@ const MongoStore= require('connect-mongo');
 const authRouter = require('../routers/auth-router.js');
 const productRouter=require('../routers/product-router.js');
 const errorMiddleware=require('../middleware/error-middleware.js');
+const enquiryRouter = require('../routers/enquiry-router.js');
 const adminRouter=require('../routers/admin-router.js');
 const cloudinary = require('cloudinary').v2;
 const {CloudinaryStorage}=require('multer-storage-cloudinary')
@@ -49,4 +50,4 @@ async function connectMongo(){
     await mongoose.connect(process.env.MONGO_DB_URL);
 }
 
-module.exports ={express,cors,cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};
+module.exports ={enquiryRouter,express,cors,cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};

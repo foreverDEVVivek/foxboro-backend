@@ -18,6 +18,9 @@ app.use('/api/v1/products',config.productRouter);
 //Admin Router
 app.use('/api/v1/admin', config.adminRouter);
 
+//Enquiry Router
+app.use('/api/v1/enquiry', config.enquiryRouter);
+
 // Error handling middleware
 app.use(config.errorMiddleware);
 

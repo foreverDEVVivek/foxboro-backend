@@ -6,10 +6,10 @@ const bannerSchema = new Schema({
     bannerImg: {
         type: [String], // Defines an array of strings
         default: [
-            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735193106/banner4_lqe4fx.png',
-            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735193106/banner3_ou7sch.png',
-            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735193106/banner1_ltpvip.jpg',
-            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735193105/banner2_sqsz3z.avif',
+            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735287399/banner3_gqnvx4.png',
+            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735287399/rb_2149083259_daebrj.png',
+            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735287399/rb_2151092224_oz5w2l.png',
+            'https://res.cloudinary.com/dv1k0bazk/image/upload/v1735287398/179630735_10744991_ko4ea8.jpg',
         ],
         set: function(value) {
             return value && value.length > 0 ? value : this.bannerImg;

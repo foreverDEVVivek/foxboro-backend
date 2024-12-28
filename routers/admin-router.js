@@ -31,14 +31,25 @@ adminRouter
   .delete(validateToken, adminController.adminDeleteUsers)
   .put(validateToken, adminController.adminUpdateUsers);
 
-// Admin Routes to change the banner images
+// Admin Routes to get the banner images
+adminRouter.route('/banner')
+.get(validateToken, adminController.adminGetBanner);
+
+// Admin routes to change the banner images
 adminRouter
   .route("/banner/:bannerId")
-  .get(validateToken, adminController.adminGetBanner)
   .put(
     validateToken,
     bannerUpload.array("bannerImages", 4),
     adminController.adminChangeBanner
   );
+
+//Admin routes to handle admin-specific operations like get all Enquiries and delete Enquiries
+adminRouter.route('/get-all-enquiries')
+.get(validateToken,adminController.getAllEnquiries);
+
+adminRouter.route('/get-all-enquiries/:enquiryId')
+.delete(validateToken,adminController.deleteEnquiries);
+//Till here 
 
 module.exports = adminRouter;

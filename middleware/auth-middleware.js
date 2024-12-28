@@ -89,7 +89,7 @@ const validateToken = async (req, res, next) => {
     } else {
       res
         .status(500)
-        .json({ message: "Internal Server Error", error: error.message });
+        .json({ message: "Internal Server Error", error: error });
     }
   }
 };
