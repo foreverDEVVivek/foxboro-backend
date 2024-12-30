@@ -161,7 +161,8 @@ const adminUpdateUsers = async (req, res) => {
   res.json({ message: "User updated successfully" });
 };
 
-//Banner Change Controller
+//Banner Change Controller 
+
 const adminChangeBanner = async (req, res) => {
   try {
     const {bannerId}=req.params;
