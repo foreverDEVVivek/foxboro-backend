@@ -162,7 +162,6 @@ const adminUpdateUsers = async (req, res) => {
 };
 
 //Banner Change Controller 
-
 const adminChangeBanner = async (req, res) => {
   try {
     const {bannerId}=req.params;
