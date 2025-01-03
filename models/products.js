@@ -31,6 +31,14 @@ const subCategorySchema = mongoose.Schema({
   },
 });
 
+// Counter Schema to maintain sequence
+const counterSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  seq: { type: Number, default: 0 }
+});
+
+const Counter = mongoose.model('Counter', counterSchema);
+
 //Separate Brand Schema
 const manufacturerSchema = mongoose.Schema({
   name: {
@@ -84,6 +92,10 @@ const vendorSchema = mongoose.Schema({
 
 //Product Schema
 const productsSchema = mongoose.Schema({
+  code:{
+    type: String,
+    unique: true
+  },
   name: {
     type: String,
     required: true,
@@ -100,6 +112,26 @@ const productsSchema = mongoose.Schema({
   vendors:{
     type: [vendorSchema],
     default: [],
+  },
+  hsnCode:{
+    type:String,
+    required: true,
+    minlength: 5,
+  },
+  deliveryIn:{
+    type: Number,
+    required: true,
+    min: 1,
+    max: 30,
+  },
+  dataSheet:{
+    type: [String],
+    required: true,
+  },
+  warranty:{
+   type: String,
+    required: true,
+    minlength: 3,
   },
   shortDescription: {
     type: String,
@@ -181,6 +213,27 @@ const productsSchema = mongoose.Schema({
   }
 });
 
+// Pre-save hook to generate the code
+productsSchema.pre('save', async function (next) {
+  const product = this;
+
+  // Only generate code if it's a new product
+  if (!product.isNew) return next();
+
+  try {
+    const counter = await Counter.findOneAndUpdate(
+      { name: 'product' },               // Counter name
+      { $inc: { seq: 1 } },              // Increment the sequence
+      { new: true, upsert: true }        // Create if not exists
+    );
+
+    const seqNumber = counter.seq.toString().padStart(4, '0'); // Zero pad the sequence number
+    product.code = `FIC${seqNumber}`;
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 const Product = mongoose.model("Product", productsSchema);
 
 module.exports = Product;

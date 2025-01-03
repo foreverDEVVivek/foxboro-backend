@@ -3,16 +3,20 @@ const { validateToken } = require("../middleware/auth-middleware");
 const adminController = require("../controllers/admin-controller");
 const validateProduct = require("../middleware/product-middleware.js");
 const multer = require("multer");
-const { storage,bannerStorage } = require("../config/cloudinaryConfig.js");
+const { storage,bannerStorage,dataSheetStorage } = require("../config/cloudinaryConfig.js");
 const upload = multer({ storage });
 const bannerUpload = multer({ storage:bannerStorage });
+const dataSheetUpload = multer({ storage:dataSheetStorage});
 
 adminRouter
   .route("/products")
   .get(validateToken, adminController.adminGetProducts)
   .post(
     validateToken,
-    upload.array("images", 4),
+    upload.fields([
+      {name:'images',maxCount:4},
+      {name:'datasheet', maxCount:1}
+    ]),
     adminController.adminPostProduct
   );
 

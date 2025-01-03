@@ -14,7 +14,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'Foxboro-backend',
-    allowed_formats: ['jpg', 'png', 'jpeg'], // Acceptable formats
+    allowed_formats: ['jpg', 'png', 'jpeg','pdf','docx'], // Acceptable formats
   },
 });
 
@@ -25,4 +25,12 @@ const bannerStorage = new CloudinaryStorage({
     allowed_formats: ['jpg', 'png', 'jpeg','avif'], // Acceptable formats
   }
 })
-module.exports = { cloudinary, storage ,bannerStorage};
+
+const dataSheetStorage =new CloudinaryStorage({
+ cloudinary:cloudinary,
+ params:{
+  folder:"Foxboro-backend/datasheet",
+  allowed_formats: ['xlsx','xls','docx','pdf'], // Acceptable formats
+ }
+})
+module.exports = { cloudinary, storage ,bannerStorage,dataSheetStorage};

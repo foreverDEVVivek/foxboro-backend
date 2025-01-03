@@ -15,14 +15,18 @@ const adminGetProducts = async (req, res) => {
 const adminPostProduct = async (req, res) => {
   try {
     // Ensure that at least 4 images are uploaded
-    if (!req.files || req.files.length === 0) {
+    if (!req.files.datasheet || !req.files.images || req.files.images.length === 0) {
       return res
         .status(400)
         .json({ message: "At least 4 images are required!" });
     }
 
     // Map the uploaded files to an array of image URLs
-    const imageUrls = req.files.map((file) => {
+    const imageUrls = req.files.images.map((file) => {
+      return file.path;
+    });
+   
+    const datasheetUrl= req.files.datasheet.map((file)=>{
       return file.path;
     });
 
@@ -38,6 +42,10 @@ const adminPostProduct = async (req, res) => {
       review: JSON.parse(req.body.review),
       modelNo: req.body.modelNo,
       image: imageUrls,
+      deliveryIn:req.body.deliveryIn,
+      hsnCode:req.body.hsnCode,
+      warranty:req.body.warranty,
+      dataSheet:datasheetUrl,
       keyFactors: JSON.parse(req.body.keyFactors),
       inrPrice: req.body.inrPrice,
       usdPrice: req.body.usdPrice,
