@@ -6,44 +6,30 @@ const {
 const User = require("../models/users");
 const Otp = require("../models/otp");
 const jwt = require("jsonwebtoken");
+const sendOtp = require("../utils/send-mailer");
 
 // Middleware to validate user input
-const validateLoginUser = async (req, res, next) => {
-
-  let { error } = loginSchema.validate(req.body);
-  if (error) {
-    next(new Error(error.message, 404));
-  } else {
-    try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ email });
-      let isValidPassword;
-      if (user) isValidPassword = await user.comparePassword(password);
-      else next(new Error("Invalid Credentials", 404));
-      if (user && isValidPassword) {
-        next();
-      } else {
-        next(new Error("Invalid Credentials", 404));
-      }
-    } catch (error) {
-      next(new Error("Unable to login"));
+const validateLogin = async (req, res, next) => {
+  try {
+    let { error } = loginSchema.validate(req.body);
+    if (error) {
+      next(new Error(error.message, 404));
+    } else {
+      next();
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message, success: false });
   }
 };
 
 // Middleware to authenticate user at sign in
-const validateSigninUser = async (req, res, next) => {
+const validateRegister = async (req, res, next) => {
   try {
     let { error } = signupSchema.validate(req.body);
     if (error) {
       next(new Error(error.message, 400));
     }
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) {
-      next(new Error("Email already exists", 404));
-    } else {
-      next();
-    }
+    next();
   } catch (error) {
     res.status(500).json({ message: error.message, success: false });
   }
@@ -59,20 +45,11 @@ const validateToken = async (req, res, next) => {
       if (!token) throw new Error("No token provided");
 
       const jwtVerified = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-      if (!jwtVerified.isAdmin) {
-        throw new Error("You are not authorized to access this page ");
+      if (!jwtVerified) {
+        res.status(403).json({ message: "Invalid JWT token", success: false });
+      } else {
+        next();
       }
-
-      const user = await User.findById(jwtVerified.userId).select({
-        password: 0,
-      });
-      if (!user) throw new Error("User not found");
-
-      req.session.verifiedUser = user;
-      req.session.verifiedToken = token;
-      req.session.verifiedId = user._id;
-      next();
     }
   } catch (error) {
     if (error.message === "No token provided") {
@@ -87,23 +64,35 @@ const validateToken = async (req, res, next) => {
     ) {
       res.status(401).json({ message: "Invalid or expired token." });
     } else {
-      res
-        .status(500)
-        .json({ message: "Internal Server Error", error: error });
+      res.status(500).json({ message: "Internal Server Error", error: error });
     }
   }
 };
 
 const validateOTP = async (req, res, next) => {
   //Validate OTP Here
-  const { error } = otpSchema.validate(req.body);
-  if (error) {
-    next(new Error(error.message, 404));
-  } else {
-    const userOtp = req.body.otp;
-    const mongoOtp = await Otp.findOne({ otp: userOtp });
-    if (mongoOtp) next();
-    else next(new Error("OTP is incorrect!", 404));
+  try {
+    const authToken = req.header("Authorization").replace("Bearer ", "").trim();
+    const verifiedUser = jwt.verify(authToken, process.env.JWT_SECRET_KEY);
+
+    const { error } = otpSchema.validate(req.body);
+    if (error) {
+      next(new Error(error.message, 404));
+    } else {
+      const userOtp = req.body.otp;
+      const mongoOtp = await Otp.findOne({
+        otp: userOtp,
+        email: verifiedUser.email,
+      });
+      if (mongoOtp) next();
+      else next(new Error("OTP is incorrect!", 404));
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error while validating OTP",
+      error: error.message,
+    });
   }
 };
 
@@ -119,9 +108,42 @@ const validateAdmin = async (req, res, next) => {
   }
 };
 
+const validateIsExist = async (req, res, next) => {
+  try {
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) {
+      next(new Error("Email already exists", 404));
+    } else {
+      sendOtp(req.body.email);
+      next();
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message, success: false });
+  }
+};
+
+const validateIsRegistered = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    let isValidPassword;
+    if (user) isValidPassword = await user.comparePassword(password);
+    else next(new Error("Invalid Credentials", 404));
+    if (user && isValidPassword) {
+      next();
+    } else {
+      next(new Error("Invalid Credentials", 404));
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message, success: false });
+  }
+};
+
 module.exports = {
-  validateLoginUser,
-  validateSigninUser,
+  validateLogin,
+  validateIsRegistered,
+  validateRegister,
+  validateIsExist,
   validateOTP,
   validateAdmin,
   validateToken,

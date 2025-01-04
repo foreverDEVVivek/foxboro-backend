@@ -9,6 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(config.cors({origin:"*"}))
 app.use(config.session(config.sessionConfig));
 app.use(config.methodOverride('_method'));
+
 //Authentication Router
 app.use('/api/v1/auth', config.authRouter);
 

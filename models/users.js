@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+const argon=require('argon2');
+
 const userSchema=mongoose.Schema({
     name: {
         type: String,
@@ -24,11 +25,6 @@ const userSchema=mongoose.Schema({
     password:{
         type:String,
         required:true,
-        match: [
-            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-            'Password must be at least 8 characters long and contain at least one letter, one number, and one special character.'
-          ],          
-        minlength: [8, 'Password must be at least 8 characters long.'],
     },
    
     isAdmin:{
@@ -49,9 +45,16 @@ userSchema.pre('save', async function(next){
     next();
   }
   try {
-    const saltRound = await bcrypt.genSalt(10);
-    const hash_password= await bcrypt.hash(currUser.password,saltRound)
-    currUser.password=hash_password;
+    if (currUser.password.startsWith("$argon2")) {
+        return next(); // Skip hashing if the password is already hashed
+      }
+        const hash_password = await argon.hash(currUser.password, {
+          type: argon.argon2id, // Use Argon2id for best balance between security and performance
+          memoryCost: 2 ** 16, // Memory usage (64MB)
+          timeCost: 3, // Number of iterations
+          parallelism: 1, // Parallel threads
+        });
+        currUser.password = hash_password;
   } catch (error) {
      next(new Error('Unable to store password'));
   }
@@ -62,10 +65,10 @@ userSchema.methods.comparePassword=async function (password){
     try {
         const hashedPassword = this.password;
         // console.log(hashedPassword)
-        const isMatch= await bcrypt.compare(password,hashedPassword);
+        const isMatch= await argon.verify(hashedPassword,password);
         return isMatch;
     } catch (error) {
-        throw new Error('Unable to resolve password');
+        throw new Error('Unable to resolve password',500);
     }
 }
 

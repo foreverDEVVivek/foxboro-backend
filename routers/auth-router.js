@@ -1,22 +1,39 @@
-const express=require('express');
-const authRouter= express.Router();
-const authController= require('../controllers/auth-controller');
-const {validateLoginUser,validateSigninUser,validateOTP,validateAdmin}=require('../middleware/auth-middleware');
+const express = require("express");
+const authRouter = express.Router();
+const authController = require("../controllers/auth-controller");
+const {
+  validateLogin,
+  validateIsExist,
+  validateRegister,
+  validateOTP,
+  validateIsRegistered,
+  validateToken,
+  validateAdmin,
+} = require("../middleware/auth-middleware");
 
 //Sign In authentication user
-authRouter.route('/signin')
-.post(validateSigninUser,authController.authSigninController);
+authRouter
+  .route("/signin")
+  .post(validateRegister, validateIsExist, authController.authSigninController);
 
 // Sign In OTP authentication user
-authRouter.route('/signin/otp')
-.post(validateOTP,authController.authSigninOtpController);
+authRouter
+  .route("/signin/otp")
+  .post(validateToken, validateOTP, authController.authSigninOtpController);
 
 // Login authentication user
-authRouter.route('/login')
-.post(validateLoginUser,validateAdmin,authController.authLoginController)
+authRouter
+  .route("/login")
+  .post(
+    validateLogin,
+    validateIsRegistered,
+    validateAdmin,
+    authController.authLoginController
+  );
 
 //Login OTP authentication user
-authRouter.route('/login/otp')
-.post(validateOTP,authController.authLoginOtpController)
+authRouter
+  .route("/login/otp")
+  .post(validateToken, validateOTP, authController.authLoginOtpController);
 
 module.exports = authRouter;
