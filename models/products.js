@@ -1,35 +1,7 @@
 const mongoose = require("mongoose");
-
-//Separate Category Schema
-const categorySchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    enum: [
-      "Machinery and Equipment",
-      "Chemical Products",
-      "Electrical Components",
-    ],
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-});
-
-//Separate Sub Category Schema
-const subCategorySchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    enum: ["Construction Machinery", "Industrial Chemicals", "Semiconductors"],
-  },
-  description: {
-    type: String,
-    required: true,
-    minlength: 10,
-  },
-});
+const Category=require('./category.js');
+const SubCategory=require('./subCategory.js');
+const customError=require('../utils/customError.js');
 
 // Counter Schema to maintain sequence
 const counterSchema = new mongoose.Schema({
@@ -40,7 +12,7 @@ const counterSchema = new mongoose.Schema({
 const Counter = mongoose.model('Counter', counterSchema);
 
 //Separate Brand Schema
-const manufacturerSchema = mongoose.Schema({
+const manufacturerSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -49,7 +21,7 @@ const manufacturerSchema = mongoose.Schema({
 });
 
 //Separate Associated Vendor Schema
-const vendorSchema = mongoose.Schema({
+const vendorSchema =new mongoose.Schema({
    company:{
     type:String,
     required:true,
@@ -91,7 +63,7 @@ const vendorSchema = mongoose.Schema({
 });
 
 //Product Schema
-const productsSchema = mongoose.Schema({
+const productsSchema =new mongoose.Schema({
   code:{
     type: String,
     unique: true
@@ -144,12 +116,16 @@ const productsSchema = mongoose.Schema({
     min: 1,
   },
   category: {
-    type: categorySchema,
-    default: () => ({}),
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"Category",
+    default: null,
+    required:true,
   },
   subCategory: {
-    type: subCategorySchema,
-    default: () => ({}),
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"subCategory",
+    default: null,
+    required:true,
   },
   review: [
     {
@@ -211,7 +187,7 @@ const productsSchema = mongoose.Schema({
     required: true,
     enum: ["Cash on Delivery", "Online Payment"],
   }
-});
+},{timestamps:true});
 
 // Pre-save hook to generate the code
 productsSchema.pre('save', async function (next) {
@@ -221,6 +197,7 @@ productsSchema.pre('save', async function (next) {
   if (!product.isNew) return next();
 
   try {
+    //Product code is generated here..
     const counter = await Counter.findOneAndUpdate(
       { name: 'product' },               // Counter name
       { $inc: { seq: 1 } },              // Increment the sequence
@@ -229,11 +206,31 @@ productsSchema.pre('save', async function (next) {
 
     const seqNumber = counter.seq.toString().padStart(4, '0'); // Zero pad the sequence number
     product.code = `FIC${seqNumber}`;
+
+    //Now, checking the product category and sub category does exist
+    const category = await Category.findById(product.category);
+    if (!category) {
+      return next(new customError('Invalid category',404));
+    }
+
+    const subCategory = await SubCategory.findById(product.subCategory);
+
+    if(!subCategory) {
+      return next(new customError('Invalid sub category',404));
+    }
+
+    if(subCategory.category.toString()!==product.category.toString()) {
+      return next(new customError("Sub Category does not belong to specified category",404));
+    }
     next();
   } catch (err) {
     next(err);
   }
 });
+
+
+productsSchema.index({ category: 1, subCategory: 1 });
+
 const Product = mongoose.model("Product", productsSchema);
 
 module.exports = Product;

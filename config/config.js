@@ -4,6 +4,7 @@ const mongoose=require('mongoose');
 const express = require('express');
 const MongoStore= require('connect-mongo');
 const authRouter = require('../routers/auth-router.js');
+const {rateLimit}=require('express-rate-limit');
 const productRouter=require('../routers/product-router.js');
 const errorMiddleware=require('../middleware/error-middleware.js');
 const enquiryRouter = require('../routers/enquiry-router.js');
@@ -33,6 +34,12 @@ const cloudinaryConfig={
     api_secret: process.env.CLOUDINARY_API_SECRET,
 };
 
+const limiter= rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 1000, // limit the number of requests per 15 minutes is 1000
+    message: 'Too many requests from this IP, please try again after 15 minutes.',
+    legacyHeaders: false,
+})
 cloudinary.config(cloudinaryConfig);
 
 const CloudinaryStorageConfig={
@@ -50,4 +57,4 @@ async function connectMongo(){
     await mongoose.connect(process.env.MONGO_DB_URL);
 }
 
-module.exports ={enquiryRouter,express,cors,cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};
+module.exports ={limiter,enquiryRouter,express,cors,cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};

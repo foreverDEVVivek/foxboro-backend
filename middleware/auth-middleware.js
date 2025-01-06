@@ -96,17 +96,6 @@ const validateOTP = async (req, res, next) => {
   }
 };
 
-const validateAdmin = async (req, res, next) => {
-  const adminUser = await User.findOne({ email: req.body.email }).select({
-    password: 0,
-  });
-  if (adminUser.isAdmin) {
-    const token = await adminUser.generateJsonWebToken();
-    res.json({ token: token, message: "Your are admin", isAdmin: true });
-  } else {
-    next();
-  }
-};
 
 const validateIsExist = async (req, res, next) => {
   try {
@@ -145,6 +134,5 @@ module.exports = {
   validateRegister,
   validateIsExist,
   validateOTP,
-  validateAdmin,
   validateToken,
 };

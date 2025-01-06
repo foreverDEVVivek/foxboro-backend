@@ -1,12 +1,10 @@
 const adminRouter = require("express").Router();
 const { validateToken } = require("../middleware/auth-middleware");
 const adminController = require("../controllers/admin-controller");
-const validateProduct = require("../middleware/product-middleware.js");
 const multer = require("multer");
-const { storage,bannerStorage,dataSheetStorage } = require("../config/cloudinaryConfig.js");
+const { storage,bannerStorage} = require("../config/cloudinaryConfig.js");
 const upload = multer({ storage });
 const bannerUpload = multer({ storage:bannerStorage });
-const dataSheetUpload = multer({ storage:dataSheetStorage});
 
 adminRouter
   .route("/products")

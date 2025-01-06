@@ -11,7 +11,7 @@ app.use(config.session(config.sessionConfig));
 app.use(config.methodOverride('_method'));
 
 //Authentication Router
-app.use('/api/v1/auth', config.authRouter);
+app.use('/api/v1/auth',config.limiter, config.authRouter);
 
 //Product Router
 app.use('/api/v1/products',config.productRouter);

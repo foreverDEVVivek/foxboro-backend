@@ -8,7 +8,6 @@ const {
   validateOTP,
   validateIsRegistered,
   validateToken,
-  validateAdmin,
 } = require("../middleware/auth-middleware");
 
 //Sign In authentication user
@@ -27,7 +26,6 @@ authRouter
   .post(
     validateLogin,
     validateIsRegistered,
-    validateAdmin,
     authController.authLoginController
   );
 
