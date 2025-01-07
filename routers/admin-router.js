@@ -1,5 +1,6 @@
 const adminRouter = require("express").Router();
 const { validateToken } = require("../middleware/auth-middleware");
+const{validateIsAdmin,validateCategory}=require('../middleware/admin-middleware.js');
 const adminController = require("../controllers/admin-controller");
 const multer = require("multer");
 const { storage,bannerStorage} = require("../config/cloudinaryConfig.js");
@@ -8,7 +9,7 @@ const bannerUpload = multer({ storage:bannerStorage });
 
 adminRouter
   .route("/products")
-  .get(validateToken, adminController.adminGetProducts)
+  .get(validateToken, validateIsAdmin,adminController.adminGetProducts)
   .post(
     validateToken,
     upload.fields([
@@ -21,37 +22,54 @@ adminRouter
 //Update products or delete products
 adminRouter
   .route("/products/:productId")
-  .put(validateToken, adminController.adminUpdateProduct)
-  .delete(validateToken, adminController.adminDeleteProduct);
+  .put(validateToken,validateIsAdmin, adminController.adminUpdateProduct)
+  .delete(validateToken,validateIsAdmin, adminController.adminDeleteProduct);
 
 // Admin routes to handle admin-specific operations like get all Users
-adminRouter.route("/users").get(validateToken, adminController.adminGetUsers);
+adminRouter.route("/users").get(validateToken,validateIsAdmin, adminController.adminGetUsers);
 
 // Admin routes to handle admin-specific operations like delete Users and update users
 adminRouter
   .route("/users/:userId")
-  .delete(validateToken, adminController.adminDeleteUsers)
-  .put(validateToken, adminController.adminUpdateUsers);
+  .delete(validateToken,validateIsAdmin, adminController.adminDeleteUsers)
+  .put(validateToken, validateIsAdmin,adminController.adminUpdateUsers);
 
 // Admin Routes to get the banner images
 adminRouter.route('/banner')
-.get(validateToken, adminController.adminGetBanner);
+.get(validateToken,validateIsAdmin, adminController.adminGetBanner);
 
 // Admin routes to change the banner images
 adminRouter
   .route("/banner/:bannerId")
   .put(
     validateToken,
+    validateIsAdmin,
     bannerUpload.array("bannerImages", 4),
     adminController.adminChangeBanner
   );
 
 //Admin routes to handle admin-specific operations like get all Enquiries and delete Enquiries
 adminRouter.route('/get-all-enquiries')
-.get(validateToken,adminController.getAllEnquiries);
+.get(validateToken,validateIsAdmin,adminController.getAllEnquiries);
 
 adminRouter.route('/get-all-enquiries/:enquiryId')
-.delete(validateToken,adminController.deleteEnquiries);
+.delete(validateToken,validateIsAdmin,adminController.deleteEnquiries);
 //Till here 
+
+//Get all categories
+adminRouter.route('/get-all-categories')
+.get(validateToken,validateIsAdmin,adminController.getAllCategories)
+.post(validateToken,validateIsAdmin,validateCategory,adminController.addCategory)
+
+//Get all sub categories and post sub categories
+
+adminRouter.route('/get-all-sub-categories')
+.get(validateToken,validateIsAdmin,adminController.getAllSubCategories)
+
+adminRouter.route('/get-all-sub-categories/:categoryId')
+.get(validateToken,validateIsAdmin,adminController.getSubCategoriesByCategory)
+.post(validateToken,validateIsAdmin,validateCategory,adminController.addSubCategory)
+
+//Get all sub categories of a particular category
 
 module.exports = adminRouter;

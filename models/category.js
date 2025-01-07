@@ -1,13 +1,12 @@
 const mongoose =require('mongoose');
 const Schema=mongoose.Schema;
-const SubCategory=require('./subCategory');
-const Product=require('./products');
-
+const customError=require('../utils/customError');
 //new schema for category
 const categorySchema =new Schema({
   name: {
     type: String,
     required: true,
+    unique:true,
   },
   description: {
     type: String,
@@ -16,14 +15,18 @@ const categorySchema =new Schema({
   subCategory:[{
     type:Schema.Types.ObjectId,
     ref:"subCategory"
-  }]
+  }],
+
 },{timestamps:true});
 
 categorySchema.pre('save',async function (next){
   try {
     const category =this;
-    if(!category.isNew){
-      return next();
+
+    const foundCategory=await mongoose.model('Category',categorySchema).findOne({name:category.name});
+
+    if(foundCategory){
+      return next(new customError('Already category added',403));
     }
     next();
   } catch (error) {
@@ -35,10 +38,10 @@ categorySchema.post('findOneAndDelete', async function(category,next){
   try {
     if(category && category.subCategory.length>0){
     //delete all sub category of this category
-    await SubCategory.deleteMany({_id: {$in:category.subCategory}});
+    await mongoose.model('subCategory').deleteMany({_id: {$in:category.subCategory}});
 
     //delete all product of this category
-    await Product.deleteMany({
+    await mongoose.model('Product').deleteMany({
       category:category._id
     });
 
@@ -51,4 +54,6 @@ categorySchema.post('findOneAndDelete', async function(category,next){
 categorySchema.index({ name: 1 });
 
 
-module.exports=mongoose.model("Category",categorySchema);
+const Category=mongoose.model("Category",categorySchema);
+
+module.exports=Category;

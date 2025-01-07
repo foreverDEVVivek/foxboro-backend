@@ -1,6 +1,8 @@
 const User = require("../models/users.js");
 const jwt = require("jsonwebtoken");
 const Enquiry = require('../models/enquiry.js')
+const Category=require('../models/category.js')
+const SubCategory=require('../models/subCategory.js')
 const Banner= require('../models/banner.js')
 const Product = require("../models/products.js");
 const bcrypt = require("bcryptjs");
@@ -224,6 +226,93 @@ const deleteEnquiries = async(req,res)=>{
   }
 }
 
+const getAllCategories=async(req,res)=>{
+  try {
+    const allCategories=await Category.find();
+    res.status(200).json({success:true,allCategories});
+  } catch (error) {
+   res.status(500).json({success:false, message:error.message})
+  }
+}
+
+const addCategory=async(req,res)=>{
+  try {
+    const newCategory=await Category.create(req.body);
+    res.status(200).json({success:true, message:"Category added successfully.", newCategory});
+  } catch (error) {
+   res.status(500).json({success:false,message:error.message}); 
+  }
+}
+
+const getAllSubCategories=async(req,res)=>{
+  try {
+    const allSubCategories=await SubCategory.find();
+    res.status(200).json({success:true,allSubCategories});
+  } catch (error) {
+    res.status(500).json({success:false, message:error.message})
+  }
+}
+
+const addSubCategory=async(req,res)=>{
+  try {
+    const {categoryId}=req.params;
+    if(!categoryId){
+      return res.status(400).json({message: "categoryId is required!"});  // check if categoryId is provided. If not, return error message. 400 Bad Request status code.  // 400 is a client error, meaning the request was malformed or invalid.  // The client should not repeat the request.  // In this case, the client is trying to create a subcategory without providing the categoryId.
+    }
+    else{
+
+    //Check whether it exists before or not
+    const category=await Category.findById(categoryId);
+    if(!category){
+      return res.status(404).json({success:false,message: "Category not found!"});
+    }
+
+    const isExists=await SubCategory.findOne({name:req.body.name});
+    if(isExists){
+      return res.status(409).json({success:false,message: "Subcategory already exists!"});
+    }
+
+    const newSubCategory=await SubCategory({
+      name:req.body.name,
+      description:req.body.description,
+      category:categoryId,
+    });
+    
+    await Category.findByIdAndUpdate(categoryId,{
+      $push:{subCategory:newSubCategory._id}
+    });
+    
+    await newSubCategory.save();
+    res.status(200).json({success:true, message:"Subcategory added successfully.", newSubCategory});
+  }
+  } catch (error) {
+    res.status(500).json({success:false,message:error.message}); 
+  }
+}
+
+const getSubCategoriesByCategory=async(req,res)=>{
+  try {
+    const {categoryId}=req.params;
+    if(!categoryId){
+     return res.status(404).json({message: 'Category Id is required',success:false});
+    }
+
+    const category=await Category.findById(categoryId);
+    if(!category){
+    return res.status(404).json({message: 'Category not found',success:false});
+    }
+
+    const allSubCategories= await Category.findById(categoryId).populate({
+      name:"subCategory",
+      path:"subCategory",
+    });
+
+    res.status(200).json({success:true, allSubCategories});
+
+  } catch (error) {
+    res.status(500).json({message:error.message,success:false});
+  }
+}
 module.exports = {
   adminGetProducts,
   adminChangeBanner,
@@ -236,4 +325,9 @@ module.exports = {
   adminGetBanner,
   adminDeleteUsers,
   adminUpdateUsers,
+  getAllCategories,
+  addCategory,
+  getAllSubCategories,
+  addSubCategory,
+  getSubCategoriesByCategory
 };
