@@ -1,4 +1,10 @@
 const Joi = require("joi");
+const countryList = require("country-list");
+
+const rawData = countryList.getData();
+const allCountry = rawData.flatMap((country) => {
+  return [country.name];
+});
 
 const loginSchema = Joi.object({
   email: Joi.string()
@@ -13,13 +19,14 @@ const loginSchema = Joi.object({
     .min(8)
     .max(255)
     .messages({
-      "string.pattern.base": "Password must include at least one letter, one number, and one special character.",
+      "string.pattern.base":
+        "Password must include at least one letter, one number, and one special character.",
       "string.min": "Password must be at least 8 characters long.",
       "any.required": "Password is required.",
     }),
 }).required();
 
-//Joi Sign In schema 
+//Joi Sign In schema
 const signupSchema = Joi.object({
   name: Joi.string().min(3).max(255).required().messages({
     "string.empty": "Name is required.",
@@ -39,7 +46,8 @@ const signupSchema = Joi.object({
     .min(8)
     .max(255)
     .messages({
-      "string.pattern.base": "Password must include at least one letter, one number, and one special character.",
+      "string.pattern.base":
+        "Password must include at least one letter, one number, and one special character.",
       "string.min": "Password must be at least 8 characters long.",
       "any.required": "Password is required.",
     }),
@@ -49,38 +57,31 @@ const signupSchema = Joi.object({
     "string.empty": "Confirm Password is required.",
   }),
 
-  phone: Joi.string()
-    .pattern(new RegExp("^[0-9]{10}$"))
-    .optional()
-    .messages({
-      "string.pattern.base": "Phone number must be 10 digits.",
-    }),
-
+  phone: Joi.string().pattern(new RegExp("^[0-9]{10}$")).optional().messages({
+    "string.pattern.base": "Phone number must be 10 digits.",
+  }),
 }).required();
 
-const otpSchema= Joi.object({
-  otp: Joi.string()
-    .pattern(new RegExp("^[0-9]{6}$"))
-    .required()
-    .messages({
-      "string.pattern.base": "OTP must be 6 digits.",
-    }),
+const otpSchema = Joi.object({
+  otp: Joi.string().pattern(new RegExp("^[0-9]{6}$")).required().messages({
+    "string.pattern.base": "OTP must be 6 digits.",
+  }),
 }).required();
 
 // Joi Schema for Category
 const categorySchema = Joi.object({
-  name: Joi.string()
-     .min(5)
-    .required()
-    .messages({
-      "string.min": "Name must be at least 5 characters long.",
-      "any.required": "Name is required.",
-    }),
+  name: Joi.string().min(5).required().messages({
+    "string.min": "Name must be at least 5 characters long.",
+    "any.required": "Name is required.",
+  }),
 
-  description: Joi.string().min(5).messages({
-    "string.min": "Description must be at least 5 characters long.",
-    "any.required": "Description is required.",
-  }).required(),
+  description: Joi.string()
+    .min(5)
+    .messages({
+      "string.min": "Description must be at least 5 characters long.",
+      "any.required": "Description is required.",
+    })
+    .required(),
 }).required();
 
 // Joi Schema for Sub-Category
@@ -150,14 +151,26 @@ const productSchema = Joi.object({
     .required(),
 }).required();
 
-
-//validate enquiry 
+//validate enquiry
 const enquirySchema = Joi.object({
   name: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
   phone: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
   description: Joi.string().min(10).required(),
   country: Joi.string()
-})
-module.exports = { categorySchema,loginSchema, signupSchema, otpSchema, productSchema,enquirySchema };
-
+    .valid(...allCountry) // Validate against all country names
+    .messages({
+      "any.only": "Country must be one of the valid countries.", // Custom message for invalid country
+      "string.empty": "Country is required." // Custom message for empty country field
+    })
+    .required(),
+  company: Joi.string().min(4).required()
+});
+module.exports = {
+  categorySchema,
+  loginSchema,
+  signupSchema,
+  otpSchema,
+  productSchema,
+  enquirySchema,
+};
