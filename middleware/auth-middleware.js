@@ -115,18 +115,22 @@ const validateIsRegistered = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    let isValidPassword;
+    let isValidPassword = false;
+
     if (user) isValidPassword = await user.comparePassword(password);
-    else next(new Error("Invalid Credentials", 404));
-    if (user && isValidPassword) {
-      next();
-    } else {
-      next(new Error("Invalid Credentials", 404));
+
+    if (!user || !isValidPassword) {
+      const error = new Error("Invalid Credentials");
+      error.status = 404;
+      return next(error);
     }
+
+    next(); // Proceed to the next middleware
   } catch (error) {
-    res.status(500).json({ error: error.message, success: false });
+    next(error); // Pass any unexpected errors to the global error handler
   }
 };
+
 
 module.exports = {
   validateLogin,
