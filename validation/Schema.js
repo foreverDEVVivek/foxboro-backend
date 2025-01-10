@@ -157,6 +157,7 @@ const enquirySchema = Joi.object({
   email: Joi.string().email().required(),
   phone: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
   description: Joi.string().min(10).required(),
+  country: Joi.string()
 })
 module.exports = { categorySchema,loginSchema, signupSchema, otpSchema, productSchema,enquirySchema };
 

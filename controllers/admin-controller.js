@@ -7,6 +7,7 @@ const Banner= require('../models/banner.js')
 const Product = require("../models/products.js");
 const bcrypt = require("bcryptjs");
 
+
 //Get all Products -- Admin only
 const adminGetProducts = async (req, res) => {
   const allProducts = await Product.find({});

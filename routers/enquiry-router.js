@@ -7,5 +7,7 @@ const {validateEnquiry}=require('../middleware/enquiry-middleware');
 Router.route('/')
 .post(validateEnquiry,enquiryController.postEnquiry);
 
+Router.route('/get-all-countries')
+.get(enquiryController.getAllCountries);
 
 module.exports=Router;

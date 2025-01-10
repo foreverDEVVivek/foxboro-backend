@@ -17,6 +17,14 @@ const enquirySchema = new Schema({
         match: [/^[0-9]{10}$/, 'Phone number must be 10 digits.'],
         required: false
     },
+    country:{
+        type:String,
+        required: true,
+    },
+    company:{
+        type: String,
+        required: true,
+    },
     description: {
         type: String,
         required: true
@@ -24,6 +32,10 @@ const enquirySchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    isReplied:{
+        type: Boolean,
+        default: false,
     }
 },{timestamps: true});
 
