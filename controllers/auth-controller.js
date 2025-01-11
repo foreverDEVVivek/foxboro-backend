@@ -112,9 +112,34 @@ const authSigninOtpController = async (req, res) => {
     res.status(403).json({ message: error.message, success: false });
   }
 };
+
+const authValidateIsAdmin = async(req,res)=>{
+  try {
+    const token = req.header('Authorization').replace("Bearer ","").trim();
+    const verifiedUser = jwt.verify(token, process.env.JWT_SECRET_KEY);
+     
+    //Getting user data from DB by user id
+    const user = await User.findById(verifiedUser.userId);
+  
+    if(!user){
+      res.status(404).json({success:false, message: "User Not Found"})
+      return;  //Returning here to prevent further execution if user not found.
+    }
+
+    if(!user.isAdmin){
+      res.status(404).json({success:false, message: "You are not allowed to access this page"})
+    }
+    else{
+      res.status(200).json({success:true, message:"You are allowed to access this page Admin"});
+    }
+  } catch (error) {
+    res.status(403).json({ message: error.message, success: false });
+  }
+}
 module.exports = {
   authLoginController,
   authSigninController,
   authSigninOtpController,
   authLoginOtpController,
+  authValidateIsAdmin,
 };

@@ -34,4 +34,9 @@ authRouter
   .route("/login/otp")
   .post(validateToken, validateOTP, authController.authLoginOtpController);
 
+//To Check A user is admin or not
+authRouter
+.route('/validate-isAdmin')
+.get(validateToken, authController.authValidateIsAdmin);
+
 module.exports = authRouter;
