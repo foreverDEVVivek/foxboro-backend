@@ -131,7 +131,6 @@ const validateIsRegistered = async (req, res, next) => {
   }
 };
 
-
 module.exports = {
   validateLogin,
   validateIsRegistered,

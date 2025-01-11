@@ -9,13 +9,18 @@ const authLoginController = async (req, res) => {
   try {
     //Sending the mail otp
     sendOtp(req.body.email);
+
+    //getting user
+    const user = await User.findOne({ email: req.body.email });
     
     //molding email into data
     const data={
-      email:req.body.email
+      email:req.body.email,
+      role:user.isAdmin
     };
 
     const authToken = await generateToken(data);
+
     res.status(200).json({ message: "OTP Sent Successfully!",success:true, authToken });
   } catch (error) {
     res
@@ -32,7 +37,13 @@ const authLoginOtpController = async (req, res) => {
       email: verifiedUser.email,
     }).select({ password: 0 });
     const token = await user.generateJsonWebToken();
+
+    if(verifiedUser.role){
+      res.json({message:"Thank you for Log In", token: token, success: true, isAdmin: true});
+    }
+    else{
     res.json({ message: "Thank you for Log In", token: token,success: true });
+  }
   } catch (error) {
     new Error("Error while logging in", 404);
   }
