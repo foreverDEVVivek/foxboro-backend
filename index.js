@@ -26,7 +26,7 @@ app.use('/api/v1/enquiry', config.enquiryRouter);
 // Error handling middleware
 app.use(config.errorMiddleware);
 
-app.listen(80, () => {
+app.listen(process.env.PORT, () => {
     config.connectMongo()
     .then(()=>{
         console.log('Connected to MongoDB');
