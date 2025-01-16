@@ -33,6 +33,7 @@ const adminPostProduct = async (req, res) => {
       return file.path;
     });
 
+
     const data = {
       name: req.body.name,
       price: req.body.price,
@@ -40,8 +41,8 @@ const adminPostProduct = async (req, res) => {
       vendors: JSON.parse(req.body.vendors),
       shortDescription: req.body.shortDescription,
       quantity: req.body.quantity,
-      category: JSON.parse(req.body.category),
-      subCategory: JSON.parse(req.body.subCategory),
+      category: req.query.category,
+      subCategory: req.query.subCategory,
       review: JSON.parse(req.body.review),
       modelNo: req.body.modelNo,
       image: imageUrls,
@@ -64,8 +65,9 @@ const adminPostProduct = async (req, res) => {
     // Save the new product to the database
     await newProduct.save();
 
-    res.json({ message: "Product added successfully", product: newProduct });
+    res.json({success:true, message: "Product added successfully" });// product: newProduct
   } catch (error) {
+    console.log(error)
     res.json({ message: error.message, success: false });
   }
 };

@@ -59,10 +59,10 @@ adminRouter
   .route("/get-all-enquiries")
   .get(validateToken, validateIsAdmin, adminController.getAllEnquiries);
 
+//Admin is able to delete all Enquiries
 adminRouter
   .route("/get-all-enquiries/:enquiryId")
   .delete(validateToken, validateIsAdmin, adminController.deleteEnquiries);
-//Till here
 
 //Get all categories
 adminRouter

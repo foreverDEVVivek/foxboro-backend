@@ -103,7 +103,6 @@ const productsSchema =new mongoose.Schema({
   warranty:{
    type: String,
     required: true,
-    minlength: 3,
   },
   shortDescription: {
     type: String,
