@@ -7,6 +7,7 @@ const {
   getAllProductsByCategoryId,
   getAllSubCategoriesByCategoryId,
   getAllCategories,
+  getAllProductsBySubcategoryId
 } = require("../controllers/product-controller.js");
 const productRouter = express.Router();
 
@@ -24,9 +25,14 @@ productRouter
   .get(getAllSubCategoriesByCategoryId);
 
 //Getting product by Category ID
-productRouter.route('/get-all-products/:categoryId')
+productRouter.route('/get-all-products/category/:categoryId')
 .get(getAllProductsByCategoryId);
 
+//Getting products by Subcategory ID
+productRouter.route('/get-all-products/subCategory/:subCategoryId')
+.get(getAllProductsBySubcategoryId);
+
+//Getting banner Images
 productRouter.route("/get-banner-images").get(getBannerImages);
 
 productRouter.route("/:id").get(getProduct);

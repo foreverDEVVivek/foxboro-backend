@@ -71,6 +71,7 @@ const getAllSubCategoriesByCategoryId = async (req, res) => {
 const getAllProductsByCategoryId = async (req, res) => {
   try {
     const { categoryId } = req.params;
+
     if (!categoryId) {
       return res
        .status(404)
@@ -83,6 +84,20 @@ const getAllProductsByCategoryId = async (req, res) => {
   }
 };
 
+const getAllProductsBySubcategoryId = async (req, res) => {
+  try {
+    const {subCategoryId}=req.params;
+    
+    if(!subCategoryId){
+      return res.status(404).json({message: 'Subcategory Id is required',success:false});
+    }
+    const allProducts=await Product.find({ subCategory: subCategoryId });
+    res.status(200).json({ success: true, allProducts });
+  } catch (error) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+}
+
 module.exports = {
   getAllProductsByCategoryId,
   getAllSubCategoriesByCategoryId,
@@ -91,4 +106,5 @@ module.exports = {
   getProduct,
   getBannerImages,
   getAllCategories,
+  getAllProductsBySubcategoryId,
 };

@@ -13,7 +13,9 @@ const validateIsAdmin = async (req, res, next) => {
     } else {
       next();
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(401).json({ success: false, message: "Invalid token" });
+  }
 };
 
 const validateCategory=async(req,res,next)=>{

@@ -37,6 +37,6 @@ authRouter
 //To Check A user is admin or not
 authRouter
 .route('/validate-isAdmin')
-.get(validateToken, authController.authValidateIsAdmin);
+.get(validateToken,authController.authValidateIsAdmin);
 
 module.exports = authRouter;
