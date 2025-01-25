@@ -7,7 +7,9 @@ const authRouter = require('../routers/auth-router.js');
 const {rateLimit}=require('express-rate-limit');
 const productRouter=require('../routers/product-router.js');
 const errorMiddleware=require('../middleware/error-middleware.js');
+const morgan = require('morgan');
 const enquiryRouter = require('../routers/enquiry-router.js');
+const logger = require('../utils/logger.js')
 const adminRouter=require('../routers/admin-router.js');
 const cloudinary = require('cloudinary').v2;
 const {CloudinaryStorage}=require('multer-storage-cloudinary')
@@ -50,6 +52,21 @@ const CloudinaryStorageConfig={
     },
 }
 
+const morganFormat = ":method :url :status :response-time ms";
+
+const morganSettings = {
+    stream:{
+        write: function(message){
+            const logObject = {
+                method: message.split(" ")[0],
+                url: message.split(" ")[1],
+                status: message.split(" ")[2],
+                responseTime: message.split(" ")[3],
+            };
+            logger.info(JSON.stringify(logObject));
+        }
+    }
+}
 const storage= new CloudinaryStorage(CloudinaryStorageConfig)
 
 async function connectMongo(){
@@ -57,4 +74,4 @@ async function connectMongo(){
     await mongoose.connect(process.env.MONGO_DB_URL);
 }
 
-module.exports ={limiter,enquiryRouter,express,cors,cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};
+module.exports ={morgan,morganFormat, morganSettings,logger,limiter,enquiryRouter,express,cors,cloudinary,storage,path,authRouter,connectMongo,errorMiddleware,productRouter,adminRouter,sessionConfig ,MongoStore,session,methodOverride};

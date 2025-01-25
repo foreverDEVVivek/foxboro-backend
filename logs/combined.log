@@ -1,0 +1,2 @@
+{"level":"error","message":"Password must include at least one letter, one number, and one special character."}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"404\",\"responseTime\":\"38.648\"}"}

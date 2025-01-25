@@ -11,6 +11,12 @@ app.use(config.cors({origin:"*"}))
 app.use(config.session(config.sessionConfig));
 app.use(config.methodOverride('_method'));
 
+//Globally configuring the logging 
+global.logger=config.logger;
+
+//Setting up morgan
+app.use(config.morgan(config.morganFormat, config.morganSettings))
+
 //Authentication Router
 app.use('/api/v1/auth',config.limiter, config.authRouter);
 

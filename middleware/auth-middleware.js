@@ -13,6 +13,7 @@ const validateLogin = async (req, res, next) => {
   try {
     let { error } = loginSchema.validate(req.body);
     if (error) {
+      logger.error(error.message)//as error came the log is registered in this
       next(new Error(error.message, 404));
     } else {
       next();
