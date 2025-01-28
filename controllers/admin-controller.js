@@ -16,9 +16,9 @@ const adminGetProducts = async (req, res) => {
 
 //Post a new Product -- Admin only
 const adminPostProduct = async (req, res) => {
-  try {
+  try { 
     // Ensure that at least 4 images are uploaded
-    if (!req.files.datasheet || !req.files.images || req.files.images.length === 0) {
+    if (!req.files.datasheet || !req.files.images) {
       return res
         .status(400)
         .json({ message: "At least 4 images are required!" });
@@ -67,8 +67,7 @@ const adminPostProduct = async (req, res) => {
 
     res.json({success:true, message: "Product added successfully" });// product: newProduct
   } catch (error) {
-    console.log(error)
-    res.json({ message: error.message, success: false });
+    res.status(400).json({ message: error.message, success: false });
   }
 };
 

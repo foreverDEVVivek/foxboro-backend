@@ -6,9 +6,10 @@ const {
 } = require("../middleware/admin-middleware.js");
 const adminController = require("../controllers/admin-controller");
 const multer = require("multer");
-const { storage, bannerStorage } = require("../config/cloudinaryConfig.js");
-const upload = multer({ storage });
-const bannerUpload = multer({ storage: bannerStorage });
+const { storage, bannerStorage,dataSheetStorage } = require("../config/cloudinaryConfig.js");
+const upload = multer({ storage:storage })
+const dataSheetUpload = multer({storage: dataSheetStorage});
+const bannerUpload = multer({ storage: bannerStorage })
 
 adminRouter
   .route("/products")
@@ -16,8 +17,8 @@ adminRouter
   .post(
     validateToken,
     upload.fields([
-      { name: "images", maxCount: 4 },
-      { name: "datasheet", maxCount: 1 },
+      {name:"images",maxCount:4},
+      {name:"datasheet",maxCount:1}
     ]),
     adminController.adminPostProduct
   );

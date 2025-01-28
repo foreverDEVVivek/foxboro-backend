@@ -23,6 +23,7 @@ const authLoginController = async (req, res) => {
 
     res.status(200).json({ message: "OTP Sent Successfully!",success:true, authToken });
   } catch (error) {
+    logger.error(error.message)
     res
       .status(404)
       .json({ message: error, success:false });
@@ -45,6 +46,7 @@ const authLoginOtpController = async (req, res) => {
     res.json({ message: "Thank you for Log In", token: token,success: true });
   }
   } catch (error) {
+    logger.error(error.message)
     new Error("Error while logging in", 404);
   }
 };

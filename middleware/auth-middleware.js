@@ -13,12 +13,12 @@ const validateLogin = async (req, res, next) => {
   try {
     let { error } = loginSchema.validate(req.body);
     if (error) {
-      logger.error(error.message)//as error came the log is registered in this
       next(new Error(error.message, 404));
     } else {
       next();
     }
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({ message: error.message, success: false });
   }
 };
@@ -32,6 +32,7 @@ const validateRegister = async (req, res, next) => {
     }
     next();
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({ message: error.message, success: false });
   }
 };
@@ -65,6 +66,7 @@ const validateToken = async (req, res, next) => {
     ) {
       res.status(401).json({ message: "Invalid or expired token." });
     } else {
+      logger.error(error.message);
       res.status(500).json({ message: "Internal Server Error", error: error });
     }
   }
@@ -88,7 +90,8 @@ const validateOTP = async (req, res, next) => {
       if (mongoOtp) next();
       else next(new Error("OTP is incorrect!", 404));
     }
-  } catch (error) {
+  } catch (error) { 
+    logger.error(error.message)
     res.status(500).json({
       success: false,
       message: "Error while validating OTP",
@@ -96,7 +99,6 @@ const validateOTP = async (req, res, next) => {
     });
   }
 };
-
 
 const validateIsExist = async (req, res, next) => {
   try {
@@ -108,6 +110,7 @@ const validateIsExist = async (req, res, next) => {
       next();
     }
   } catch (error) {
+    logger.error(error.message)
     res.status(500).json({ error: error.message, success: false });
   }
 };
@@ -128,10 +131,10 @@ const validateIsRegistered = async (req, res, next) => {
 
     next(); // Proceed to the next middleware
   } catch (error) {
+    logger.error(error.message)
     next(error); // Pass any unexpected errors to the global error handler
   }
 };
-
 
 module.exports = {
   validateLogin,
