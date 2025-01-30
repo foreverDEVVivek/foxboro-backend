@@ -63,8 +63,13 @@ adminRouter
 //Admin is able to delete all Enquiries
 adminRouter
   .route("/get-all-enquiries/:enquiryId")
+  .get(validateToken, validateIsAdmin, adminController.getSingleEnquiry)
   .delete(validateToken, validateIsAdmin, adminController.deleteEnquiries);
 
+adminRouter
+ .route('/get-all-enquiries/:enquiryId/action-on-enquiry')
+ .patch(validateToken,validateIsAdmin, adminController.updateEnquiry);
+ 
 //Get all categories
 adminRouter
   .route("/get-all-categories")
