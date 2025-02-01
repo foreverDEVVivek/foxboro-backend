@@ -21,7 +21,7 @@ const adminPostProduct = async (req, res) => {
     if (!req.files.datasheet || !req.files.images) {
       return res
         .status(400)
-        .json({ message: "At least 4 images are required!" });
+        .json({ success:false,message: "At least 4 images are required!" });
     }
 
     // Map the uploaded files to an array of image URLs
