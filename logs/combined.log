@@ -105,3 +105,11 @@
 {"level":"error","message":"jwt expired"}
 {"level":"info","message":"{\"method\":\"GET\",\"url\":\"/api/v1/admin/get-all-enquiries/679bb3f1e44f253aa9a2c12b\",\"status\":\"500\",\"responseTime\":\"2.515\"}"}
 {"level":"info","message":"{\"method\":\"GET\",\"url\":\"/api/v1/admin/get-all-enquiries/679bb3f1e44f253aa9a2c12b\",\"status\":\"200\",\"responseTime\":\"29.799\"}"}
+{"level":"info","message":"{\"method\":\"GET\",\"url\":\"/api/v1/products/get-all-products/6784ebef5ff484b886895be6\",\"status\":\"404\",\"responseTime\":\"7.964\"}"}
+{"level":"info","message":"{\"method\":\"GET\",\"url\":\"/api/v1/products/get-all-products/6784ebef5ff484b886895be6\",\"status\":\"404\",\"responseTime\":\"2.594\"}"}
+{"level":"info","message":"{\"method\":\"GET\",\"url\":\"/api/v1/products/get-all-products/6784ebef5ff484b886895be6\",\"status\":\"404\",\"responseTime\":\"1.539\"}"}
+{"level":"info","message":"{\"method\":\"GET\",\"url\":\"/api/v1/products/get-all-products/category/6784ebef5ff484b886895be6\",\"status\":\"200\",\"responseTime\":\"1094.921\"}"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"990.792\"}"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login\",\"status\":\"200\",\"responseTime\":\"335.769\"}"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login/otp\",\"status\":\"404\",\"responseTime\":\"48.141\"}"}
+{"level":"info","message":"{\"method\":\"POST\",\"url\":\"/api/v1/auth/login/otp\",\"status\":\"200\",\"responseTime\":\"95.004\"}"}
